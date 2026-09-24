@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Anti-Vision — 避けたい未来を、避ける</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #15161b;
+    --panel: #1b1c23;
+    --panel-2: #212229;
+    --border: #34353e;
+    --border-soft: #2a2b33;
+    --text: #eceae6;
+    --text-muted: #91929c;
+    --text-faint: #7e7f89;
+    --ember: #d6551f;
+    --ember-soft: #3a2418;
+    --danger: #c24545;
+    --teal: #4a8f7e;
+    --teal-2: #3a6f63;
+    --teal-3: #295049;
+    --teal-soft: #1c3630;
+    --radius: 3px;
+    color-scheme: dark;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  :root[data-theme="light"] {
+    --bg: #f2efe9;
+    --panel: #ffffff;
+    --panel-2: #ece8e0;
+    --border: #d8d2c6;
+    --border-soft: #e3ded3;
+    --text: #201f1c;
+    --text-muted: #6b675f;
+    --text-faint: #716d5b;
+    --ember: #b8481a;
+    --ember-soft: #f2ddce;
+    --danger: #a83a3a;
+    --teal: #2f6d5c;
+    --teal-2: #6ba496;
+    --teal-3: #b6d6cc;
+    --teal-soft: #d9e8e2;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f2efe9; --panel: #ffffff; --panel-2: #ece8e0; --border: #d8d2c6; --border-soft: #e3ded3;
+      --text: #201f1c; --text-muted: #6b675f; --text-faint: #716d5b; --ember: #b8481a; --ember-soft: #f2ddce;
+      --danger: #a83a3a; --teal: #2f6d5c; --teal-2: #6ba496; --teal-3: #b6d6cc; --teal-soft: #d9e8e2;
+      color-scheme: light;
+    }
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .frame { max-width: 680px; margin: 0 auto; padding: 40px 20px 100px; }
+  .topbar { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 32px; gap: 12px; }
+  .brand { font-family: 'Shippori Mincho', serif; font-weight: 600; font-size: 19px; letter-spacing: 0.02em; }
+  .brand small { display: block; font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 11px; color: var(--text-faint); font-weight: 400; margin-top: 2px; }
+  .theme-toggle { background: none; border: 1px solid var(--border); color: var(--text-muted); border-radius: var(--radius); padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: inherit; flex-shrink: 0; }
+  .theme-toggle:hover { color: var(--text); border-color: var(--text-faint); }
+
+  .plaque { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--ember); padding: 24px 22px; margin-bottom: 24px; }
+  .plaque-label { font-size: 12px; color: var(--ember); font-weight: 700; margin-bottom: 10px; }
+  .plaque-text { font-family: 'Shippori Mincho', serif; font-size: 18px; line-height: 1.85; font-weight: 500; white-space: pre-wrap; word-break: break-word; }
+  .plaque-text.empty { color: var(--text-faint); font-size: 16px; }
+  .plaque-edit { margin-top: 14px; background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 3px; font-family: inherit; }
+  .plaque-edit:hover { color: var(--text); }
+  .warn-strip { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-soft); font-size: 13px; color: var(--danger); display: none; }
+  .warn-strip.show { display: block; }
+
+  .commitment { display: flex; align-items: center; gap: 8px; margin-bottom: 30px; font-size: 13px; color: var(--text-muted); flex-wrap: wrap; }
+  .commitment-label-wrap { position: relative; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+  .info-btn { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--text-faint); background: none; color: var(--text-faint); font-size: 10px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; font-family: inherit; }
+  .info-btn:hover, .info-btn.active { border-color: var(--ember); color: var(--ember); }
+  .info-bubble { display: none; position: absolute; top: 24px; left: 0; z-index: 30; width: 280px; max-width: 80vw; max-height: 60vh; overflow-y: auto; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; font-size: 12px; line-height: 1.75; color: var(--text-muted); box-shadow: 0 6px 20px rgba(0,0,0,0.28); }
+  .info-bubble-divider { height: 1px; background: var(--border-soft); margin: 10px 0; }
+  .info-bubble.show { display: block; }
+  .info-bubble p { margin: 0 0 8px; }
+  .info-bubble p:last-child { margin-bottom: 0; }
+  .info-bubble p.info-bubble-hint { color: var(--text-faint); font-size: 11px; }
+  .info-bubble strong { color: var(--text); font-weight: 700; }
+  .info-bubble ul { margin: 0 0 10px; padding-left: 16px; }
+  .info-bubble li { margin-bottom: 5px; color: var(--text); }
+  .info-bubble-arrow { position: absolute; top: -6px; left: 10px; width: 10px; height: 10px; background: var(--panel); border-left: 1px solid var(--border); border-top: 1px solid var(--border); transform: rotate(45deg); }
+  .commitment input { flex: 1; min-width: 160px; background: none; border: none; border-bottom: 1px dashed var(--border); color: var(--text); font-family: inherit; font-size: 13px; padding: 4px 2px; }
+  .commitment input:focus { border-bottom-color: var(--ember); }
+  .commitment input::placeholder { color: var(--text-faint); }
+
+  /* --- dashboard --- */
+  .dash-head { font-size: 13px; color: var(--text-muted); margin: 0 0 14px; }
+  .dash-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; }
+
+  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .cal-nav { background: none; border: 1px solid var(--border); color: var(--text-muted); border-radius: var(--radius); width: 30px; height: 30px; cursor: pointer; font-size: 15px; line-height: 1; font-family: inherit; }
+  .cal-nav:hover:not(:disabled) { color: var(--text); border-color: var(--text-faint); }
+  .cal-nav:disabled { opacity: 0.3; cursor: default; }
+  .cal-month-title { font-size: 14px; color: var(--text); font-variant-numeric: tabular-nums; }
+  .cal-weekday-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 6px; }
+  .cal-weekday-row span { font-size: 10px; color: var(--text-faint); text-align: center; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-cell { position: relative; width: 100%; aspect-ratio: 1; border-radius: 3px; background: var(--panel-2); border: 1px solid var(--border-soft); }
+  .cal-cell.other-month { opacity: 0.3; }
+  .cal-daynum { position: absolute; top: 3px; left: 5px; font-size: 9px; color: var(--text-faint); }
+  .cal-cell.lvl-1 { background: var(--teal-soft); border-color: var(--teal-soft); }
+  .cal-cell.lvl-2 { background: var(--teal-2); border-color: var(--teal-2); }
+  .cal-cell.lvl-3 { background: var(--teal); border-color: var(--teal); }
+  .cal-cell.lvl-2 .cal-daynum, .cal-cell.lvl-3 .cal-daynum { color: rgba(255,255,255,0.85); }
+  .cal-cell.today { outline: 1.5px dashed var(--ember); outline-offset: 1px; }
+  .cal-legend { display: flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 10px; color: var(--text-faint); justify-content: flex-end; }
+  .cal-legend .cal-cell { width: 10px; height: 10px; flex-shrink: 0; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .stat { background: var(--panel); padding: 16px 8px; text-align: center; }
+  .stat-num { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+  .stat-label { font-size: 10px; color: var(--text-faint); margin-top: 4px; line-height: 1.4; }
+
+  /* --- log form --- */
+  .section-head { font-size: 13px; color: var(--text-muted); margin: 34px 0 14px; }
+  .log-form { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; background: var(--panel); margin-bottom: 24px; }
+  .log-form label { font-size: 11px; color: var(--text-faint); display: block; margin: 10px 0 4px; }
+  .log-form label:first-of-type { margin-top: 0; }
+  .log-form input[type=text] { width: 100%; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 13.5px; padding: 9px 11px; border-radius: var(--radius); }
+  .log-form textarea { width: 100%; min-height: 60px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 13.5px; padding: 9px 11px; border-radius: var(--radius); resize: vertical; }
+  .log-form input::placeholder { color: var(--text-faint); }
+  .chip-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .timer-row { display: flex; align-items: center; gap: 12px; }
+  .timer-row .btn.running { background: var(--ember); border-color: var(--ember); color: #fff; }
+  .timer-display { font-variant-numeric: tabular-nums; font-size: 15px; color: var(--text-muted); }
+  .timer-display.running { color: var(--ember); font-weight: 700; }
+  .timer-hint { font-size: 10.5px; color: var(--text-faint); margin: 6px 0 0; }
+  .time-tier-label { font-size: 10px; color: var(--text-faint); margin: 8px 0 4px; }
+  .time-tier-label:first-of-type { margin-top: 4px; }
+  .chip { background: var(--panel-2); border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; padding: 7px 12px; border-radius: 20px; cursor: pointer; font-family: inherit; }
+  .chip.active { background: var(--teal-soft); border-color: var(--teal); color: var(--teal); }
+  .chip.q-active-1 { background: var(--teal-soft); border-color: var(--teal-3); color: var(--text); }
+  .chip.q-active-2 { background: var(--teal-2); border-color: var(--teal-2); color: #fff; }
+  .chip.q-active-3 { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .add-row { display: flex; gap: 8px; margin-top: 14px; }
+  .btn { font-family: inherit; font-size: 13px; padding: 9px 16px; border-radius: var(--radius); cursor: pointer; border: 1px solid var(--border); background: none; color: var(--text-muted); }
+  .btn:hover { color: var(--text); border-color: var(--text-faint); }
+  .btn-primary { background: var(--ember); border-color: var(--ember); color: #fff; }
+  .btn-primary:hover { color: #fff; filter: brightness(1.08); }
+  .btn.del:hover:not(:disabled) { color: var(--danger); border-color: var(--danger); }
+  .btn:disabled { opacity: 0.35; cursor: default; }
+
+  /* --- log list --- */
+  .log-item { display: flex; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--border-soft); }
+  .log-item:last-child { border-bottom: none; }
+  .log-date { flex-shrink: 0; width: 56px; font-size: 11px; color: var(--text-faint); padding-top: 2px; font-variant-numeric: tabular-nums; }
+  .log-time { display: block; font-size: 10px; color: var(--text-faint); margin-top: 2px; }
+  .log-body { flex: 1; min-width: 0; }
+  .log-text { font-size: 14px; color: var(--text); }
+  .log-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; font-size: 11.5px; color: var(--text-faint); }
+  .log-meta .q1 { color: var(--text-faint); } .log-meta .q2 { color: var(--teal-2); } .log-meta .q3 { color: var(--teal); font-weight: 700; }
+  .log-comment-text { font-size: 12.5px; color: var(--text-muted); margin-top: 6px; padding: 8px 10px; background: var(--panel-2); border-left: 2px solid var(--border); border-radius: 2px; white-space: pre-wrap; word-break: break-word; }
+  .log-comment-link { background: none; border: none; color: var(--text-faint); font-size: 11px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; padding: 0; font-family: inherit; margin-top: 6px; display: inline-block; }
+  .log-comment-link:hover { color: var(--ember); }
+  .log-del { background: none; border: none; color: var(--text-faint); font-size: 11px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; padding: 0; font-family: inherit; flex-shrink: 0; }
+  .log-del:hover { color: var(--danger); }
+  .empty-state { text-align: center; padding: 26px 10px; color: var(--text-faint); font-size: 13px; border: 1px dashed var(--border); border-radius: var(--radius); }
+  .log-more { text-align: center; margin-top: 10px; }
+  .log-more button { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; font-family: inherit; }
+
+  .reset-line { text-align: center; margin-top: 30px; }
+  .reset-line button { background: none; border: none; color: var(--text-faint); font-size: 11px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font-family: inherit; }
+  .reset-line button:hover { color: var(--danger); }
+
+  .overlay { position: fixed; inset: 0; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 40; }
+  .overlay-card { max-width: 460px; width: 100%; background: var(--panel); border: 1px solid var(--border); border-top: 3px solid var(--ember); padding: 28px 24px; }
+  .overlay-eyebrow { font-size: 12px; color: var(--ember); font-weight: 700; margin-bottom: 10px; }
+  .overlay-card h2 { font-family: 'Shippori Mincho', serif; font-size: 21px; font-weight: 600; margin: 0 0 12px; line-height: 1.6; }
+  .overlay-card p { font-size: 13.5px; color: var(--text-muted); margin: 0 0 18px; }
+  .overlay-card textarea { width: 100%; min-height: 130px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); font-family: 'Shippori Mincho', serif; font-size: 15px; line-height: 1.8; padding: 12px; border-radius: var(--radius); resize: vertical; margin-bottom: 14px; }
+  .overlay-hint { font-size: 11.5px; color: var(--text-faint); margin: -8px 0 16px; }
+  .av-title-label { font-size: 11px; color: var(--text-faint); display: block; margin: 0 0 6px; }
+  .av-title-input { width: 100%; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 13px; padding: 8px 10px; border-radius: var(--radius); margin-bottom: 14px; }
+
+  .project-tabs { display: flex; align-items: center; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 18px; }
+  .project-tab { flex-shrink: 0; background: var(--panel); border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; padding: 7px 14px; border-radius: 20px; cursor: pointer; font-family: inherit; white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+  .project-tab:hover { border-color: var(--text-faint); color: var(--text); }
+  .project-tab.active { background: var(--ember-soft); border-color: var(--ember); color: var(--ember); font-weight: 700; }
+  .project-tab-add { flex-shrink: 0; background: none; border: 1px dashed var(--border); color: var(--text-faint); font-size: 15px; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .project-tab-add:hover { border-color: var(--ember); color: var(--ember); }
+  .project-manage-btn { flex-shrink: 0; background: none; border: none; color: var(--text-faint); font-size: 11px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; font-family: inherit; padding: 0 4px; margin-left: 4px; }
+  .project-manage-btn:hover { color: var(--text); }
+  .proj-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .proj-row.drag-over { outline: 1.5px dashed var(--ember); outline-offset: 2px; border-radius: var(--radius); }
+  .drag-handle { flex-shrink: 0; cursor: grab; color: var(--text-faint); font-size: 14px; padding: 4px 2px; user-select: none; touch-action: none; }
+  .drag-handle:hover { color: var(--text); }
+  .proj-row.dragging { opacity: 0.4; }
+  .proj-row input { flex: 1; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 13px; padding: 8px 10px; border-radius: var(--radius); }
+  .proj-row button { flex-shrink: 0; }
+
+  .cat-section { margin-bottom: 22px; }
+  .cat-section:last-of-type { margin-bottom: 0; }
+  .cat-section-title { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+  .cat-chip-list { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .cat-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); font-size: 12px; padding: 6px 8px 6px 12px; border-radius: 20px; }
+  .cat-chip button { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 13px; line-height: 1; padding: 2px; font-family: inherit; }
+  .cat-chip button:hover { color: var(--danger); }
+  .cat-empty { font-size: 12px; color: var(--text-faint); margin-bottom: 10px; }
+  .cat-add-row { display: flex; gap: 6px; }
+  .cat-add-row input { flex: 1; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 13px; padding: 8px 10px; border-radius: var(--radius); }
+  .overlay-card.settings-card { max-width: 440px; }
+  .motivation-note-input { width: 100%; min-height: 80px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 13px; line-height: 1.7; padding: 9px 11px; border-radius: var(--radius); resize: vertical; }
+
+  @media (max-width: 480px) {
+    .frame { padding: 28px 16px 90px; }
+    .plaque-text { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="topbar">
+    <div class="brand">Anti-Vision<small>避けたい未来に、行動で応える</small></div>
+    <button class="theme-toggle" id="themeToggle" type="button">表示切替</button>
+  </div>
+
+  <div class="project-tabs" id="projectTabs"></div>
+
+  <div class="plaque" id="plaque">
+    <div class="plaque-label">もし、このまま何もしなければ</div>
+    <div class="plaque-text empty" id="plaqueText">まだ何も刻まれていません。下のボタンから、避けたい未来を書いてください。</div>
+    <button class="plaque-edit" id="plaqueEditBtn" type="button">書き直す</button>
+    <div class="warn-strip" id="warnStrip"></div>
+  </div>
+
+  <div class="commitment">
+    <div class="commitment-label-wrap">
+      <span>代償の宣言:</span>
+      <button class="info-btn" id="commitInfoBtn" type="button" aria-label="説明を見る">?</button>
+      <div class="info-bubble" id="commitInfoBubble">
+        <div class="info-bubble-arrow"></div>
+        <p><strong>アンチビジョン</strong>が「このまま何も変えなければ訪れる、遠い未来」だとしたら、<strong>代償の宣言</strong>はもっと近い距離感の一文です。「今日これをやらなかったら、今日中にどうなるか」を先に言葉にしておきます。</p>
+        <ul>
+          <li>今日やらなければ、明日の自分に言い訳することになる</li>
+          <li>サボったら、今夜は罪悪感で何も楽しめない</li>
+          <li>今日抜けたら、決めたばかりの記録が1日目で途切れる</li>
+        </ul>
+        <p class="info-bubble-hint">空欄のままでも使えます。</p>
+      </div>
+    </div>
+    <input id="commitmentInput" placeholder="例)今日やらなければ、明日の自分に説明できない" maxlength="80">
+  </div>
+
+  <div class="dash-head">継続ダッシュボード</div>
+
+  <div class="dash-panel">
+    <div class="cal-header">
+      <button class="cal-nav" id="calPrev" type="button" aria-label="前月">‹</button>
+      <div class="cal-month-title" id="calMonthTitle"></div>
+      <button class="cal-nav" id="calNext" type="button" aria-label="次月">›</button>
+    </div>
+    <div class="cal-weekday-row" id="calWeekdayRow"></div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-legend">
+      <span>行動なし</span>
+      <div class="cal-cell"></div>
+      <div class="cal-cell lvl-1"></div>
+      <div class="cal-cell lvl-2"></div>
+      <div class="cal-cell lvl-3"></div>
+      <span id="calLegendMax">しっかり行動</span>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat"><div class="stat-num" id="statStreak">0</div><div class="stat-label">連続継続日数</div></div>
+    <div class="stat"><div class="stat-num" id="statBest">0</div><div class="stat-label">最長記録</div></div>
+    <div class="stat"><div class="stat-num" id="statRate">0%</div><div class="stat-label">継続率(開始日から)</div></div>
+    <div class="stat"><div class="stat-num" id="statTotalTime">0</div><div class="stat-label">合計時間</div></div>
+    <div class="stat"><div class="stat-num" id="stat7Time">0</div><div class="stat-label">直近7日の時間</div></div>
+    <div class="stat"><div class="stat-num" id="statQuality">–</div><div class="stat-label">平均クオリティ(30日)</div></div>
+  </div>
+
+  <div class="section-head">
+    <div class="commitment-label-wrap">
+      <span>今日、何をしたか</span>
+      <button class="info-btn" id="logInfoBtn" type="button" aria-label="説明を見る">?</button>
+      <div class="info-bubble" id="logInfoBubble">
+        <div class="info-bubble-arrow"></div>
+        <div id="logInfoContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="log-form">
+    <label>行動(具体的に何をしたか)</label>
+    <input type="text" id="inputText" placeholder="例)確定申告の書類を3枚分けて封筒にまとめた" maxlength="80">
+    <label>カテゴリ(任意)</label>
+    <div class="chip-group" id="taskCategoryChips"></div>
+    <label>場所(任意)</label>
+    <div class="chip-group" id="locationChips"></div>
+    <label>かかった時間(任意)</label>
+    <div class="timer-row">
+      <button class="btn" id="timerToggleBtn" type="button">⏱ 計測開始</button>
+      <span class="timer-display" id="timerDisplay">00:00</span>
+    </div>
+    <div class="timer-hint">計測すると、下のボタンの代わりに実際の経過時間が記録されます</div>
+    <div class="time-tier-label">小さな一歩</div>
+    <div class="chip-group" id="timeChips">
+      <button class="chip" data-min="1" type="button">1分</button>
+      <button class="chip" data-min="2" type="button">2分</button>
+      <button class="chip" data-min="3" type="button">3分</button>
+      <button class="chip" data-min="4" type="button">4分</button>
+      <button class="chip" data-min="5" type="button">5分</button>
+    </div>
+    <div class="time-tier-label">がっつり</div>
+    <div class="chip-group" id="timeChipsBig">
+      <button class="chip" data-min="10" type="button">10分</button>
+      <button class="chip" data-min="30" type="button">30分</button>
+      <button class="chip" data-min="60" type="button">60分+</button>
+    </div>
+    <label>取り組みの深さ</label>
+    <div class="chip-group" id="qualityChips"></div>
+    <label>振り返り(任意)</label>
+    <textarea id="inputComment" placeholder="例)予定していた半分までしか終わらなかった。集中が続いたのは最初の10分だけだった" maxlength="500"></textarea>
+    <div class="add-row">
+      <button class="btn btn-primary" id="addBtn" type="button">記録する</button>
+      <button class="btn" id="openSettingsBtn" type="button">カテゴリを管理</button>
+    </div>
+  </div>
+
+  <div id="logList"></div>
+  <div class="empty-state" id="emptyState" style="display:none;">まだ記録がありません。今日やったことを、ひとつ記録してみてください。</div>
+  <div class="log-more" id="logMoreWrap" style="display:none;"><button id="logMoreBtn" type="button">もっと見る</button></div>
+
+  <div class="reset-line"><span id="exportWrap" style="display:none;"><button id="exportBtn" type="button">データをJSONで書き出す</button> ・ </span><button id="resetBtn" type="button">すべてのデータを消去する</button></div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var STORAGE_KEY = "anti-vision-todo-state-v3";
+  var V2_KEY = "anti-vision-todo-state-v2";
+  var LEGACY_KEY = "anti-vision-todo-state-v1";
+
+  var todayStr = function(d){ d = d || new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+  var startOfDay = function(d){ var x = new Date(d); x.setHours(0,0,0,0); return x; };
+  var addDays = function(d, n){ var x = new Date(d); x.setDate(x.getDate()+n); return x; };
+  var daysBetween = function(aStr, bStr){ var a = new Date(aStr+"T00:00:00"), b = new Date(bStr+"T00:00:00"); return Math.round((b-a)/86400000); };
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  function makeProject(overrides){
+    return Object.assign({ id: uid(), title: "", antiVision: "", commitment: "", startDate: null, actions: [] }, overrides || {});
+  }
+
+  var defaultState = {
+    projects: [],
+    activeProjectId: null,
+    theme: null,
+    locationCategories: ["自宅", "オフィス", "カフェ", "移動中"],
+    taskCategories: ["仕事", "学習", "健康", "家事"],
+    qualityLevels: [
+      { id: "q_light", label: "軽く" },
+      { id: "q_normal", label: "ふつう" },
+      { id: "q_deep", label: "しっかり" }
+    ],
+    motivationNote: ""
+  };
+
+  function normalizeQualityLevels(raw){
+    if (!raw || !raw.length) return JSON.parse(JSON.stringify(defaultState.qualityLevels));
+    if (typeof raw[0] === "string") {
+      return raw.map(function(label){ return { id: uid(), label: label }; });
+    }
+    return raw;
+  }
+  function normalizeActionQuality(a, levels){
+    if (typeof a.qualityWeight !== "number") {
+      a.qualityWeight = Math.max(0, Math.min(1, (a.quality || 2) / 3));
+    }
+    if (!a.qualityLabel) {
+      var idx = Math.round(a.qualityWeight * levels.length) - 1;
+      if (idx < 0) idx = 0;
+      if (idx > levels.length - 1) idx = levels.length - 1;
+      a.qualityLabel = (levels[idx] && levels[idx].label) || "";
+    }
+  }
+  function normalizeAllActions(s){
+    s.projects.forEach(function(p){
+      (p.actions || []).forEach(function(a){ normalizeActionQuality(a, s.qualityLevels); });
+    });
+  }
+
+  function migrateFromLegacyV1(){
+    try {
+      var raw = localStorage.getItem(LEGACY_KEY);
+      if (!raw) return null;
+      var old = JSON.parse(raw);
+      var actions = (old.tasks || []).filter(function(t){ return t.done && t.completedAt; }).map(function(t){
+        return { id: t.id || uid(), date: t.completedAt, text: t.text, location: "", minutes: null, quality: 2, createdAt: t.completedAt+"T00:00:00.000Z" };
+      });
+      var earliest = actions.reduce(function(min, a){ return (!min || a.date < min) ? a.date : min; }, null);
+      var p = makeProject({ antiVision: old.antiVision || "", commitment: old.commitment || "", actions: actions, startDate: earliest || todayStr() });
+      var s = JSON.parse(JSON.stringify(defaultState));
+      s.projects = [p];
+      s.activeProjectId = p.id;
+      s.theme = old.theme || null;
+      return s;
+    } catch(e){ return null; }
+  }
+
+  function migrateFromV2(){
+    try {
+      var raw = localStorage.getItem(V2_KEY);
+      if (!raw) return null;
+      var old = JSON.parse(raw);
+      var p = makeProject({
+        antiVision: old.antiVision || "", commitment: old.commitment || "",
+        startDate: old.startDate || null, actions: old.actions || []
+      });
+      var s = JSON.parse(JSON.stringify(defaultState));
+      s.projects = [p];
+      s.activeProjectId = p.id;
+      s.theme = old.theme || null;
+      if (old.locationCategories) s.locationCategories = old.locationCategories;
+      if (old.taskCategories) s.taskCategories = old.taskCategories;
+      s.qualityLevels = normalizeQualityLevels(old.qualityLabels);
+      return s;
+    } catch(e){ return null; }
+  }
+
+  function loadState(){
+    try {
+      var result;
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var loaded = Object.assign(JSON.parse(JSON.stringify(defaultState)), JSON.parse(raw));
+        if (!loaded.projects || !loaded.projects.length) loaded.projects = [makeProject({ title: "マイビジョン" })];
+        if (!loaded.projects.some(function(p){ return p.id === loaded.activeProjectId; })) loaded.activeProjectId = loaded.projects[0].id;
+        if (!loaded.motivationNote) loaded.motivationNote = "";
+        loaded.qualityLevels = normalizeQualityLevels(loaded.qualityLevels);
+        result = loaded;
+      } else {
+        result = migrateFromV2() || migrateFromLegacyV1();
+        if (!result) {
+          result = JSON.parse(JSON.stringify(defaultState));
+          var p0 = makeProject({ title: "マイビジョン" });
+          result.projects = [p0];
+          result.activeProjectId = p0.id;
+        }
+      }
+      normalizeAllActions(result);
+      return result;
+    } catch(e){
+      console.error("state load failed", e);
+      var fallback = JSON.parse(JSON.stringify(defaultState));
+      var pF = makeProject({ title: "マイビジョン" });
+      fallback.projects = [pF];
+      fallback.activeProjectId = pF.id;
+      return fallback;
+    }
+  }
+  function saveState(){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){ console.error("state save failed", e); } }
+
+  var state = loadState();
+  saveState();
+  function getActiveProject(){
+    return state.projects.find(function(p){ return p.id === state.activeProjectId; }) || state.projects[0];
+  }
+  var proj = getActiveProject();
+
+  // ---- theme ----
+  function applyTheme(){
+    if (state.theme === "light" || state.theme === "dark") document.documentElement.setAttribute("data-theme", state.theme);
+    else document.documentElement.removeAttribute("data-theme");
+  }
+  applyTheme();
+  document.getElementById("themeToggle").addEventListener("click", function(){
+    var cur = document.documentElement.getAttribute("data-theme");
+    state.theme = cur === "dark" ? "light" : (cur === "light" ? null : "dark");
+    applyTheme(); saveState();
+  });
+
+  // ---- DOM refs ----
+  var plaqueText = document.getElementById("plaqueText");
+  var plaqueEditBtn = document.getElementById("plaqueEditBtn");
+  var warnStrip = document.getElementById("warnStrip");
+  var projectTabs = document.getElementById("projectTabs");
+  var commitmentInput = document.getElementById("commitmentInput");
+  var calMonthTitle = document.getElementById("calMonthTitle");
+  var calWeekdayRow = document.getElementById("calWeekdayRow");
+  var calGrid = document.getElementById("calGrid");
+  var calPrev = document.getElementById("calPrev");
+  var calNext = document.getElementById("calNext");
+  var statStreak = document.getElementById("statStreak");
+  var statBest = document.getElementById("statBest");
+  var statRate = document.getElementById("statRate");
+  var statTotalTime = document.getElementById("statTotalTime");
+  var stat7Time = document.getElementById("stat7Time");
+  var statQuality = document.getElementById("statQuality");
+  var inputText = document.getElementById("inputText");
+  var inputComment = document.getElementById("inputComment");
+  var locationChips = document.getElementById("locationChips");
+  var taskCategoryChips = document.getElementById("taskCategoryChips");
+  var timeChips = document.getElementById("timeChips");
+  var timeChipsBig = document.getElementById("timeChipsBig");
+  var timerToggleBtn = document.getElementById("timerToggleBtn");
+  var timerDisplay = document.getElementById("timerDisplay");
+  var qualityChips = document.getElementById("qualityChips");
+  var addBtn = document.getElementById("addBtn");
+  var openSettingsBtn = document.getElementById("openSettingsBtn");
+  var logList = document.getElementById("logList");
+  var emptyState = document.getElementById("emptyState");
+  var logMoreWrap = document.getElementById("logMoreWrap");
+  var logMoreBtn = document.getElementById("logMoreBtn");
+  var resetBtn = document.getElementById("resetBtn");
+  var exportBtn = document.getElementById("exportBtn");
+  var exportWrap = document.getElementById("exportWrap");
+
+  commitmentInput.value = proj.commitment || "";
+  commitmentInput.addEventListener("input", function(){ proj.commitment = commitmentInput.value; saveState(); });
+
+  // ---- project (multi anti-vision) switcher ----
+  function projectLabel(p){
+    if (p.title && p.title.trim()) return p.title.trim();
+    if (p.antiVision && p.antiVision.trim()) {
+      var t = p.antiVision.trim();
+      return t.length > 12 ? t.slice(0, 12) + "…" : t;
+    }
+    return "(未設定)";
+  }
+  function resetTransientFormState(){
+    logShowCount = LOG_PAGE;
+    calViewYear = (new Date()).getFullYear();
+    calViewMonth = (new Date()).getMonth();
+    selectedLocation = null;
+    selectedTaskCategory = null;
+    selectedMinutes = null;
+    selectedQuality = 2;
+    inputText.value = "";
+    inputComment.value = "";
+    clearTimeChipActive();
+    resetTimerDisplay();
+    commitmentInput.value = proj.commitment || "";
+    renderLocationChips();
+    renderTaskCategoryChips();
+    renderQualityChips();
+  }
+  function switchProject(id){
+    if (id === state.activeProjectId) return;
+    state.activeProjectId = id;
+    proj = getActiveProject();
+    saveState();
+    resetTransientFormState();
+    renderProjectTabs();
+    renderAll();
+  }
+  function createNewProject(){
+    var p = makeProject({});
+    state.projects.push(p);
+    state.activeProjectId = p.id;
+    proj = p;
+    saveState();
+    resetTransientFormState();
+    renderProjectTabs();
+    renderAll();
+    openAntiVisionEditor(true);
+  }
+  function renderProjectTabs(){
+    projectTabs.innerHTML = "";
+    state.projects.forEach(function(p){
+      var btn = document.createElement("button");
+      btn.className = "project-tab" + (p.id === state.activeProjectId ? " active" : "");
+      btn.type = "button";
+      var label = projectLabel(p);
+      btn.textContent = label;
+      btn.title = label;
+      btn.addEventListener("click", function(){ switchProject(p.id); });
+      projectTabs.appendChild(btn);
+    });
+    var addBtn2 = document.createElement("button");
+    addBtn2.className = "project-tab-add";
+    addBtn2.type = "button";
+    addBtn2.textContent = "+";
+    addBtn2.setAttribute("aria-label", "新しいアンチビジョンを追加");
+    addBtn2.addEventListener("click", createNewProject);
+    projectTabs.appendChild(addBtn2);
+
+    var manageBtn = document.createElement("button");
+    manageBtn.className = "project-manage-btn";
+    manageBtn.type = "button";
+    manageBtn.textContent = "管理";
+    manageBtn.addEventListener("click", openProjectSettings);
+    projectTabs.appendChild(manageBtn);
+  }
+  function openConfirmDialog(message, onConfirm){
+    var overlay = document.createElement("div");
+    overlay.className = "overlay";
+    overlay.innerHTML =
+      '<div class="overlay-card">' +
+        '<div class="overlay-eyebrow">確認</div>' +
+        '<h2>本当によろしいですか?</h2>' +
+        '<p>' + escapeHtml(message) + '</p>' +
+        '<div class="add-row">' +
+          '<button class="btn btn-primary" id="confirmYes" type="button">削除する</button>' +
+          '<button class="btn" id="confirmNo" type="button">キャンセル</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    overlay.querySelector("#confirmYes").addEventListener("click", function(){
+      document.body.removeChild(overlay);
+      onConfirm();
+    });
+    overlay.querySelector("#confirmNo").addEventListener("click", function(){
+      document.body.removeChild(overlay);
+    });
+  }
+
+  function openProjectSettings(){
+    var overlay = document.createElement("div");
+    overlay.className = "overlay";
+    overlay.innerHTML =
+      '<div class="overlay-card settings-card">' +
+        '<div class="overlay-eyebrow">設定</div>' +
+        '<h2>アンチビジョンを管理</h2>' +
+        '<p>タブに出す名前を変更したり、使わなくなったものを削除できます。記録・カレンダーもまとめて削除されるので注意してください。</p>' +
+        '<div id="projList"></div>' +
+        '<div class="add-row"><button class="btn btn-primary" id="projDone" type="button">閉じる</button></div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    var projList = overlay.querySelector("#projList");
+    function refresh(){
+      projList.innerHTML = "";
+      state.projects.forEach(function(p){
+        var row = document.createElement("div");
+        row.className = "proj-row";
+        var input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = 16;
+        input.value = p.title || "";
+        input.placeholder = projectLabel(p);
+        input.addEventListener("change", function(){
+          p.title = input.value.trim();
+          saveState();
+          renderProjectTabs();
+        });
+        row.appendChild(input);
+        var del = document.createElement("button");
+        del.className = "btn del";
+        del.type = "button";
+        del.textContent = "削除";
+        del.disabled = state.projects.length <= 1;
+        del.addEventListener("click", function(){
+          if (state.projects.length <= 1) return;
+          openConfirmDialog('「' + projectLabel(p) + '」の記録・カレンダーもすべて削除します。', function(){
+            state.projects = state.projects.filter(function(x){ return x.id !== p.id; });
+            if (state.activeProjectId === p.id) {
+              state.activeProjectId = state.projects[0].id;
+              proj = getActiveProject();
+              resetTransientFormState();
+            }
+            saveState();
+            renderProjectTabs();
+            renderAll();
+            refresh();
+          });
+        });
+        row.appendChild(del);
+        projList.appendChild(row);
+      });
+    }
+    refresh();
+    overlay.querySelector("#projDone").addEventListener("click", function(){
+      document.body.removeChild(overlay);
+    });
+  }
+  renderProjectTabs();
+
+  function wireInfoBubble(btnId, bubbleId){
+    var btn = document.getElementById(btnId);
+    var bubble = document.getElementById(bubbleId);
+    btn.addEventListener("click", function(e){
+      e.stopPropagation();
+      var willShow = !bubble.classList.contains("show");
+      bubble.classList.toggle("show", willShow);
+      btn.classList.toggle("active", willShow);
+    });
+    document.addEventListener("click", function(e){
+      if (bubble.classList.contains("show") && !bubble.contains(e.target) && e.target !== btn) {
+        bubble.classList.remove("show");
+        btn.classList.remove("active");
+      }
+    });
+  }
+  wireInfoBubble("commitInfoBtn", "commitInfoBubble");
+  wireInfoBubble("logInfoBtn", "logInfoBubble");
+
+  function renderLogInfoContent(){
+    var el = document.getElementById("logInfoContent");
+    if (!el) return;
+    if (state.motivationNote && state.motivationNote.trim()) {
+      el.innerHTML = '<p style="white-space:pre-wrap;">' + escapeHtml(state.motivationNote.trim()) + '</p>';
+    } else {
+      el.innerHTML = '<p class="info-bubble-hint">まだ何も設定されていません。「カテゴリを管理」から、自分の好きな言葉やモットーを登録できます。</p>';
+    }
+  }
+  renderLogInfoContent();
+
+  // ---- anti-vision plaque ----
+  function renderPlaque(){
+    if (proj.antiVision && proj.antiVision.trim()) {
+      plaqueText.textContent = proj.antiVision; plaqueText.classList.remove("empty");
+    } else {
+      plaqueText.textContent = "まだ何も刻まれていません。下のボタンから、避けたい未来を書いてください。"; plaqueText.classList.add("empty");
+    }
+    var today = todayStr();
+    var todayHas = proj.actions.some(function(a){ return a.date === today; });
+    var hasAnyHistory = proj.actions.length > 0;
+    var hour = new Date().getHours();
+    if (hasAnyHistory && !todayHas && hour >= 18) {
+      warnStrip.textContent = "今日はまだ何も記録されていません。このまま眠れば、上の未来に一日分近づきます。";
+      warnStrip.classList.add("show");
+    } else warnStrip.classList.remove("show");
+  }
+  plaqueEditBtn.addEventListener("click", function(){ openAntiVisionEditor(false); });
+
+  function openAntiVisionEditor(isOnboarding){
+    var overlay = document.createElement("div");
+    overlay.className = "overlay";
+    overlay.innerHTML =
+      '<div class="overlay-card">' +
+        '<div class="overlay-eyebrow">' + (isOnboarding ? "はじめに" : "書き直す") + '</div>' +
+        '<h2>' + (isOnboarding ? "避けたい未来を、先に見ておく" : "アンチビジョンを編集") + '</h2>' +
+        '<p>' + (isOnboarding ? "理想の未来を描く代わりに、今のまま何も変えなかったら訪れる未来を、できるだけ具体的に書いてください。1つだけ、半年後か1年後の場面で構いません。" : "今のまま何も変えなかったら訪れる、避けたい未来を書き直してください。") + '</p>' +
+        '<textarea id="avInput" placeholder="例)1年後も同じ場所にいて、あの時始めていればと思っている。"></textarea>' +
+        '<div class="overlay-hint">抽象的な言葉より、場面が思い浮かぶ具体的な描写のほうが効きます。</div>' +
+        '<label class="av-title-label">タブに出す短い名前(任意)</label>' +
+        '<input type="text" id="avTitleInput" class="av-title-input" placeholder="例)副業を始める" maxlength="16">' +
+        '<div class="add-row"><button class="btn btn-primary" id="avSave" type="button">保存する</button>' +
+          (isOnboarding ? '' : '<button class="btn" id="avCancel" type="button">キャンセル</button>') + '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    var ta = overlay.querySelector("#avInput");
+    var titleInput = overlay.querySelector("#avTitleInput");
+    ta.value = proj.antiVision || "";
+    titleInput.value = proj.title || "";
+    ta.focus();
+    overlay.querySelector("#avSave").addEventListener("click", function(){
+      var v = ta.value.trim();
+      if (!v) { ta.focus(); return; }
+      proj.antiVision = v;
+      proj.title = titleInput.value.trim();
+      if (!proj.startDate) proj.startDate = todayStr();
+      saveState(); renderPlaque(); renderDashboard(); renderProjectTabs();
+      document.body.removeChild(overlay);
+    });
+    var cancelBtn = overlay.querySelector("#avCancel");
+    if (cancelBtn) cancelBtn.addEventListener("click", function(){ document.body.removeChild(overlay); });
+  }
+  if (!proj.antiVision || !proj.antiVision.trim()) openAntiVisionEditor(true);
+
+  // ---- derived data from actions ----
+  function dateSetFromActions(){
+    var s = {};
+    proj.actions.forEach(function(a){ s[a.date] = true; });
+    return s;
+  }
+  function computeStreaks(){
+    var set = dateSetFromActions();
+    var today = startOfDay(new Date());
+    var cur = 0, cursor = new Date(today);
+    if (!set[todayStr(cursor)]) cursor = addDays(cursor, -1);
+    while (set[todayStr(cursor)]) { cur++; cursor = addDays(cursor, -1); }
+    var arr = Object.keys(set).sort();
+    var best = 0, run = 0, prev = null;
+    arr.forEach(function(ds){
+      var d = new Date(ds+"T00:00:00");
+      if (prev && (d - prev) === 86400000) run++; else run = 1;
+      if (run > best) best = run;
+      prev = d;
+    });
+    return { current: cur, best: best };
+  }
+  function computeRate(){
+    var set = dateSetFromActions();
+    var startStr = proj.startDate || todayStr();
+    var todayStrVal = todayStr();
+    var elapsedDays = Math.max(1, daysBetween(startStr, todayStrVal) + 1);
+    var count = 0;
+    for (var i = 0; i < elapsedDays; i++) { if (set[todayStr(addDays(new Date(startStr+"T00:00:00"), i))]) count++; }
+    return Math.round((count/elapsedDays)*100);
+  }
+  function qualityTier(weight){
+    if (typeof weight !== "number") weight = 0.5;
+    if (weight <= 0.34) return 1;
+    if (weight <= 0.67) return 2;
+    return 3;
+  }
+  function formatMinutes(min){
+    if (!min) return "0分";
+    if (min < 60) return min + "分";
+    var h = Math.floor(min/60), m = min % 60;
+    return m ? (h + "時間" + m + "分") : (h + "時間");
+  }
+  function computeTime(){
+    var total = 0, last7 = 0;
+    var today = startOfDay(new Date());
+    proj.actions.forEach(function(a){
+      if (!a.minutes) return;
+      total += a.minutes;
+      var d = new Date(a.date+"T00:00:00");
+      if ((today - d) / 86400000 < 7) last7 += a.minutes;
+    });
+    return { total: total, last7: last7 };
+  }
+  function computeQuality30(){
+    var today = startOfDay(new Date());
+    var vals = proj.actions.filter(function(a){
+      var d = new Date(a.date+"T00:00:00");
+      return (today - d) / 86400000 < 30;
+    }).map(function(a){ return typeof a.qualityWeight === "number" ? a.qualityWeight : 0.5; });
+    if (!vals.length) return null;
+    return (vals.reduce(function(a,b){ return a+b; },0) / vals.length) * 100;
+  }
+
+  // ---- calendar (month grid with paging) ----
+  var WEEKDAYS_JA = ["月","火","水","木","金","土","日"];
+  var calViewYear = (new Date()).getFullYear();
+  var calViewMonth = (new Date()).getMonth(); // 0-indexed
+
+  calWeekdayRow.innerHTML = "";
+  WEEKDAYS_JA.forEach(function(w){ var s = document.createElement("span"); s.textContent = w; calWeekdayRow.appendChild(s); });
+
+  function renderCalendar(){
+    var year = calViewYear, month = calViewMonth;
+    var firstOfMonth = new Date(year, month, 1);
+    var startDow = (firstOfMonth.getDay() + 6) % 7; // Mon=0
+    var gridStart = addDays(firstOfMonth, -startDow);
+    var lastOfMonth = new Date(year, month + 1, 0);
+    var endDow = (lastOfMonth.getDay() + 6) % 7;
+    var gridEnd = addDays(lastOfMonth, 6 - endDow);
+
+    var days = [];
+    for (var d = new Date(gridStart); d <= gridEnd; d = addDays(d, 1)) days.push(new Date(d));
+
+    calMonthTitle.textContent = year + "年" + (month + 1) + "月";
+
+    var dayInfo = {};
+    proj.actions.forEach(function(a){
+      if (!dayInfo[a.date]) dayInfo[a.date] = { count: 0, qSum: 0 };
+      dayInfo[a.date].count++;
+      dayInfo[a.date].qSum += (typeof a.qualityWeight === "number" ? a.qualityWeight : 0.5);
+    });
+
+    var todayStrVal = todayStr();
+    calGrid.innerHTML = "";
+    days.forEach(function(d){
+      var ds = todayStr(d);
+      var inMonth = d.getMonth() === month;
+      var info = dayInfo[ds];
+      var lvl = 0;
+      if (info) lvl = qualityTier(info.qSum / info.count);
+      var cell = document.createElement("div");
+      cell.className = "cal-cell" + (lvl ? " lvl-" + lvl : "") + (ds === todayStrVal ? " today" : "") + (!inMonth ? " other-month" : "");
+      cell.title = ds + (info ? "(" + info.count + "件の記録)" : "(記録なし)");
+      var num = document.createElement("span");
+      num.className = "cal-daynum";
+      num.textContent = d.getDate();
+      cell.appendChild(num);
+      calGrid.appendChild(cell);
+    });
+
+    var now = new Date();
+    calNext.disabled = (year === now.getFullYear() && month === now.getMonth());
+  }
+  calPrev.addEventListener("click", function(){
+    calViewMonth--; if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+    renderCalendar();
+  });
+  calNext.addEventListener("click", function(){
+    if (calNext.disabled) return;
+    calViewMonth++; if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+    renderCalendar();
+  });
+
+  function renderDashboard(){
+    var streaks = computeStreaks();
+    statStreak.textContent = streaks.current;
+    statBest.textContent = streaks.best;
+    statRate.textContent = computeRate() + "%";
+    var time = computeTime();
+    statTotalTime.textContent = formatMinutes(time.total);
+    stat7Time.textContent = formatMinutes(time.last7);
+    var q = computeQuality30();
+    statQuality.textContent = q === null ? "–" : Math.round(q) + "%";
+    renderCalendar();
+  }
+
+  // ---- category chips (location / task) ----
+  var selectedLocation = null;
+  var selectedTaskCategory = null;
+
+  function renderChipList(container, list, selectedValue, onPick){
+    container.innerHTML = "";
+    if (!list.length) {
+      var hint = document.createElement("span");
+      hint.className = "cat-empty";
+      hint.textContent = "まだカテゴリがありません。「カテゴリを管理」から追加できます。";
+      container.appendChild(hint);
+      return;
+    }
+    list.forEach(function(name){
+      var btn = document.createElement("button");
+      btn.className = "chip" + (selectedValue === name ? " active" : "");
+      btn.type = "button";
+      btn.textContent = name;
+      btn.addEventListener("click", function(){ onPick(name); });
+      container.appendChild(btn);
+    });
+  }
+  function renderLocationChips(){
+    renderChipList(locationChips, state.locationCategories, selectedLocation, function(name){
+      selectedLocation = (selectedLocation === name) ? null : name;
+      renderLocationChips();
+    });
+  }
+  function renderTaskCategoryChips(){
+    renderChipList(taskCategoryChips, state.taskCategories, selectedTaskCategory, function(name){
+      selectedTaskCategory = (selectedTaskCategory === name) ? null : name;
+      renderTaskCategoryChips();
+    });
+  }
+  renderLocationChips();
+  renderTaskCategoryChips();
+
+  // ---- category settings modal ----
+  openSettingsBtn.addEventListener("click", openCategorySettings);
+  function openCategorySettings(){
+    var overlay = document.createElement("div");
+    overlay.className = "overlay";
+    overlay.innerHTML =
+      '<div class="overlay-card settings-card">' +
+        '<div class="overlay-eyebrow">設定</div>' +
+        '<h2>カテゴリを管理</h2>' +
+        '<div class="cat-section">' +
+          '<div class="cat-section-title">タスクのカテゴリ</div>' +
+          '<div class="cat-chip-list" id="taskCatList"></div>' +
+          '<div class="cat-add-row"><input type="text" id="taskCatInput" placeholder="例)副業" maxlength="20"><button class="btn" id="taskCatAdd" type="button">追加</button></div>' +
+        '</div>' +
+        '<div class="cat-section">' +
+          '<div class="cat-section-title">場所のカテゴリ</div>' +
+          '<div class="cat-chip-list" id="locCatList"></div>' +
+          '<div class="cat-add-row"><input type="text" id="locCatInput" placeholder="例)実家" maxlength="20"><button class="btn" id="locCatAdd" type="button">追加</button></div>' +
+        '</div>' +
+        '<div class="cat-section">' +
+          '<div class="cat-section-title">取り組みの深さ(追加・削除・名前の変更ができます。上ほど軽く、下ほど深い扱いになります)</div>' +
+          '<div id="qualityLevelList"></div>' +
+          '<div class="cat-add-row"><input type="text" id="qLevelInput" placeholder="例)がっつり" maxlength="12"><button class="btn" id="qLevelAdd" type="button">追加</button></div>' +
+        '</div>' +
+        '<div class="cat-section">' +
+          '<div class="cat-section-title">格言・モチベーションメモ(任意)</div>' +
+          '<textarea id="motivationNoteInput" class="motivation-note-input" placeholder="例)好きな言葉や、自分への合言葉を書いておけます" maxlength="400"></textarea>' +
+        '</div>' +
+        '<div class="add-row"><button class="btn btn-primary" id="catDone" type="button">閉じる</button></div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    var taskCatList = overlay.querySelector("#taskCatList");
+    var locCatList = overlay.querySelector("#locCatList");
+
+    function renderManageList(listEl, arr, onDelete){
+      listEl.innerHTML = "";
+      arr.forEach(function(name, idx){
+        var chip = document.createElement("span");
+        chip.className = "cat-chip";
+        chip.innerHTML = '<span></span><button type="button" aria-label="削除">×</button>';
+        chip.querySelector("span").textContent = name;
+        chip.querySelector("button").addEventListener("click", function(){ onDelete(idx); });
+        listEl.appendChild(chip);
+      });
+      if (!arr.length) {
+        var e = document.createElement("span");
+        e.className = "cat-empty";
+        e.textContent = "まだありません";
+        listEl.appendChild(e);
+      }
+    }
+    function refreshManage(){
+      renderManageList(taskCatList, state.taskCategories, function(idx){
+        var removed = state.taskCategories[idx];
+        state.taskCategories.splice(idx, 1);
+        if (selectedTaskCategory === removed) selectedTaskCategory = null;
+        saveState(); refreshManage();
+      });
+      renderManageList(locCatList, state.locationCategories, function(idx){
+        var removed = state.locationCategories[idx];
+        state.locationCategories.splice(idx, 1);
+        if (selectedLocation === removed) selectedLocation = null;
+        saveState(); refreshManage();
+      });
+    }
+    refreshManage();
+
+    function addCategory(inputEl, arr){
+      var v = inputEl.value.trim();
+      if (!v) return;
+      if (arr.indexOf(v) !== -1) { inputEl.value = ""; return; }
+      arr.push(v);
+      inputEl.value = "";
+      saveState(); refreshManage();
+    }
+    overlay.querySelector("#taskCatAdd").addEventListener("click", function(){
+      addCategory(overlay.querySelector("#taskCatInput"), state.taskCategories);
+    });
+    overlay.querySelector("#locCatAdd").addEventListener("click", function(){
+      addCategory(overlay.querySelector("#locCatInput"), state.locationCategories);
+    });
+    overlay.querySelector("#taskCatInput").addEventListener("keydown", function(e){
+      if (e.key === "Enter") addCategory(overlay.querySelector("#taskCatInput"), state.taskCategories);
+    });
+    overlay.querySelector("#locCatInput").addEventListener("keydown", function(e){
+      if (e.key === "Enter") addCategory(overlay.querySelector("#locCatInput"), state.locationCategories);
+    });
+
+    var qualityLevelList = overlay.querySelector("#qualityLevelList");
+    var pointerDragId = null;
+    function refreshQualityLevels(){
+      qualityLevelList.innerHTML = "";
+      state.qualityLevels.forEach(function(level){
+        var row = document.createElement("div");
+        row.className = "proj-row";
+
+        var handle = document.createElement("span");
+        handle.className = "drag-handle";
+        handle.setAttribute("aria-label", "ドラッグで並び替え");
+        handle.textContent = "⋮⋮";
+
+        function clearDragOverStates(){
+          Array.prototype.forEach.call(qualityLevelList.children, function(r){ r.classList.remove("drag-over"); });
+        }
+        function rowUnderPoint(x, y){
+          var el = document.elementFromPoint(x, y);
+          return el ? el.closest(".proj-row") : null;
+        }
+
+        handle.addEventListener("pointerdown", function(e){
+          e.preventDefault();
+          pointerDragId = level.id;
+          row.classList.add("dragging");
+          try { handle.setPointerCapture(e.pointerId); } catch(err){}
+        });
+        handle.addEventListener("pointermove", function(e){
+          if (pointerDragId !== level.id) return;
+          clearDragOverStates();
+          var target = rowUnderPoint(e.clientX, e.clientY);
+          if (target && target !== row) target.classList.add("drag-over");
+        });
+        function finishDrag(e){
+          if (pointerDragId !== level.id) return;
+          row.classList.remove("dragging");
+          clearDragOverStates();
+          var target = rowUnderPoint(e.clientX, e.clientY);
+          pointerDragId = null;
+          if (target && target !== row) {
+            var targetIdx = Array.prototype.indexOf.call(qualityLevelList.children, target);
+            var arr = state.qualityLevels;
+            var fromIdx = arr.findIndex(function(l){ return l.id === level.id; });
+            if (fromIdx >= 0 && targetIdx >= 0 && fromIdx !== targetIdx) {
+              var moved = arr.splice(fromIdx, 1)[0];
+              arr.splice(targetIdx, 0, moved);
+              saveState();
+              renderQualityChips();
+              renderLogList();
+              renderDashboard();
+            }
+          }
+          refreshQualityLevels();
+        }
+        handle.addEventListener("pointerup", finishDrag);
+        handle.addEventListener("pointercancel", function(){
+          pointerDragId = null;
+          row.classList.remove("dragging");
+          clearDragOverStates();
+        });
+        row.appendChild(handle);
+
+        var input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = 12;
+        input.value = level.label;
+        input.addEventListener("change", function(){
+          var v = input.value.trim();
+          level.label = v || level.label;
+          input.value = level.label;
+          saveState();
+          renderQualityChips();
+          renderLogList();
+          renderDashboard();
+        });
+        row.appendChild(input);
+        var del = document.createElement("button");
+        del.className = "btn del";
+        del.type = "button";
+        del.textContent = "削除";
+        del.disabled = state.qualityLevels.length <= 1;
+        del.addEventListener("click", function(){
+          if (state.qualityLevels.length <= 1) return;
+          state.qualityLevels = state.qualityLevels.filter(function(l){ return l.id !== level.id; });
+          saveState();
+          renderQualityChips();
+          renderLogList();
+          renderDashboard();
+          refreshQualityLevels();
+        });
+        row.appendChild(del);
+        qualityLevelList.appendChild(row);
+      });
+    }
+    refreshQualityLevels();
+    var qLevelInput = overlay.querySelector("#qLevelInput");
+    function addQualityLevel(){
+      var v = qLevelInput.value.trim();
+      if (!v) return;
+      state.qualityLevels.push({ id: uid(), label: v });
+      qLevelInput.value = "";
+      saveState();
+      renderQualityChips();
+      refreshQualityLevels();
+    }
+    overlay.querySelector("#qLevelAdd").addEventListener("click", addQualityLevel);
+    qLevelInput.addEventListener("keydown", function(e){ if (e.key === "Enter") addQualityLevel(); });
+
+    var noteInput = overlay.querySelector("#motivationNoteInput");
+    noteInput.value = state.motivationNote || "";
+    noteInput.addEventListener("change", function(){
+      state.motivationNote = noteInput.value.trim();
+      saveState();
+      renderLogInfoContent();
+    });
+
+    overlay.querySelector("#catDone").addEventListener("click", function(){
+      document.body.removeChild(overlay);
+      renderLocationChips();
+      renderTaskCategoryChips();
+    });
+  }
+
+  // ---- log form ----
+  var selectedMinutes = null;
+  var selectedQuality = defaultQualityId();
+
+  function clearTimeChipActive(){
+    Array.prototype.forEach.call(timeChips.querySelectorAll(".chip"), function(c){ c.classList.remove("active"); });
+    Array.prototype.forEach.call(timeChipsBig.querySelectorAll(".chip"), function(c){ c.classList.remove("active"); });
+  }
+  function setTimeChipsDisabled(disabled){
+    Array.prototype.forEach.call(timeChips.querySelectorAll(".chip"), function(c){ c.disabled = disabled; });
+    Array.prototype.forEach.call(timeChipsBig.querySelectorAll(".chip"), function(c){ c.disabled = disabled; });
+  }
+  function onTimeChipClick(e){
+    var btn = e.target.closest(".chip");
+    if (!btn) return;
+    var m = parseInt(btn.getAttribute("data-min"), 10);
+    clearTimeChipActive();
+    if (selectedMinutes === m) { selectedMinutes = null; }
+    else { selectedMinutes = m; btn.classList.add("active"); }
+    timerDisplay.textContent = "00:00";
+    timerDisplay.classList.remove("running");
+  }
+  timeChips.addEventListener("click", onTimeChipClick);
+  timeChipsBig.addEventListener("click", onTimeChipClick);
+
+  // ---- stopwatch: measures actual elapsed time instead of a preset chip ----
+  var timerStartTs = null;
+  var timerInterval = null;
+  function formatClock(totalSec){
+    var m = Math.floor(totalSec/60), s = totalSec%60;
+    return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+  }
+  function tickTimer(){
+    var elapsedSec = Math.floor((Date.now() - timerStartTs) / 1000);
+    timerDisplay.textContent = formatClock(elapsedSec);
+  }
+  function startTimer(){
+    timerStartTs = Date.now();
+    clearTimeChipActive();
+    selectedMinutes = null;
+    setTimeChipsDisabled(true);
+    timerToggleBtn.textContent = "⏹ 計測終了";
+    timerToggleBtn.classList.add("running");
+    timerDisplay.classList.add("running");
+    tickTimer();
+    timerInterval = setInterval(tickTimer, 1000);
+  }
+  function stopTimer(){
+    if (!timerStartTs) return;
+    var elapsedSec = Math.floor((Date.now() - timerStartTs) / 1000);
+    clearInterval(timerInterval); timerInterval = null;
+    timerStartTs = null;
+    timerToggleBtn.textContent = "⏱ 計測開始";
+    timerToggleBtn.classList.remove("running");
+    timerDisplay.classList.remove("running");
+    if (elapsedSec < 60) {
+      selectedMinutes = null;
+      timerDisplay.textContent = "1分未満のため時間は記録されません";
+    } else {
+      selectedMinutes = Math.round(elapsedSec / 60);
+      timerDisplay.textContent = selectedMinutes + "分を記録します";
+    }
+    setTimeChipsDisabled(false);
+  }
+  function resetTimerDisplay(){
+    timerStartTs = null;
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    timerToggleBtn.textContent = "⏱ 計測開始";
+    timerToggleBtn.classList.remove("running");
+    timerDisplay.classList.remove("running");
+    timerDisplay.textContent = "00:00";
+    setTimeChipsDisabled(false);
+  }
+  timerToggleBtn.addEventListener("click", function(){
+    if (timerStartTs) stopTimer(); else startTimer();
+  });
+
+  function defaultQualityId(){
+    var levels = state.qualityLevels;
+    if (!levels.length) return null;
+    return levels[Math.floor((levels.length - 1) / 2)].id;
+  }
+  function renderQualityChips(){
+    var levels = state.qualityLevels;
+    if (!levels.some(function(l){ return l.id === selectedQuality; })) selectedQuality = defaultQualityId();
+    qualityChips.innerHTML = "";
+    levels.forEach(function(level, idx){
+      var tier = qualityTier((idx + 1) / levels.length);
+      var btn = document.createElement("button");
+      btn.className = "chip" + (level.id === selectedQuality ? " q-active-" + tier : "");
+      btn.type = "button";
+      btn.setAttribute("data-qid", level.id);
+      btn.textContent = level.label;
+      qualityChips.appendChild(btn);
+    });
+    var maxLabelEl = document.getElementById("calLegendMax");
+    if (maxLabelEl) maxLabelEl.textContent = (levels.length ? levels[levels.length - 1].label : "") + "行動";
+  }
+  qualityChips.addEventListener("click", function(e){
+    var btn = e.target.closest(".chip");
+    if (!btn) return;
+    selectedQuality = btn.getAttribute("data-qid");
+    renderQualityChips();
+  });
+  renderQualityChips();
+
+  addBtn.addEventListener("click", addAction);
+  inputText.addEventListener("keydown", function(e){ if (e.key === "Enter") addAction(); });
+
+  function addAction(){
+    var text = inputText.value.trim();
+    if (!text) { inputText.focus(); return; }
+    if (timerStartTs) stopTimer();
+    if (!proj.startDate) proj.startDate = todayStr();
+    var qIdx = state.qualityLevels.findIndex(function(l){ return l.id === selectedQuality; });
+    var qLevel = qIdx >= 0 ? state.qualityLevels[qIdx] : null;
+    var qWeight = qIdx >= 0 ? (qIdx + 1) / state.qualityLevels.length : 0.5;
+    proj.actions.unshift({
+      id: uid(), date: todayStr(), text: text,
+      location: selectedLocation,
+      category: selectedTaskCategory,
+      minutes: selectedMinutes,
+      qualityLabel: qLevel ? qLevel.label : "",
+      qualityWeight: qWeight,
+      comment: inputComment.value.trim(),
+      createdAt: new Date().toISOString()
+    });
+    inputText.value = "";
+    inputComment.value = "";
+    selectedMinutes = null;
+    selectedLocation = null;
+    selectedTaskCategory = null;
+    clearTimeChipActive();
+    resetTimerDisplay();
+    renderLocationChips();
+    renderTaskCategoryChips();
+    saveState();
+    renderAll();
+    inputText.focus();
+  }
+
+  function escapeHtml(s){ return s.replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+
+  var LOG_PAGE = 10;
+  var logShowCount = LOG_PAGE;
+
+  function formatTimeOfDay(iso){
+    var d = new Date(iso);
+    return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+  }
+  function renderLogList(){
+    var sorted = proj.actions.slice().sort(function(a,b){ return b.createdAt.localeCompare(a.createdAt); });
+    emptyState.style.display = sorted.length ? "none" : "block";
+    var visible = sorted.slice(0, logShowCount);
+    logList.innerHTML = "";
+    visible.forEach(function(a){
+      var el = document.createElement("div");
+      el.className = "log-item";
+      var md = a.date.slice(5).replace("-", "/");
+      var metaParts = [];
+      if (a.category) metaParts.push(escapeHtml(a.category));
+      if (a.location) metaParts.push(escapeHtml(a.location));
+      if (a.minutes) metaParts.push(a.minutes + "分");
+      var qLabel = a.qualityLabel || "";
+      var qTier = qualityTier(a.qualityWeight);
+      if (qLabel) metaParts.push('<span class="q' + qTier + '">' + escapeHtml(qLabel) + '</span>');
+      var commentHtml = a.comment
+        ? '<div class="log-comment-text">' + escapeHtml(a.comment) + '</div><button class="log-comment-link" data-id="' + a.id + '" type="button">振り返りを編集</button>'
+        : '<button class="log-comment-link" data-id="' + a.id + '" type="button">振り返りを書く</button>';
+      el.innerHTML =
+        '<div class="log-date">' + md + '<span class="log-time">' + formatTimeOfDay(a.createdAt) + '</span></div>' +
+        '<div class="log-body">' +
+          '<div class="log-text">' + escapeHtml(a.text) + '</div>' +
+          '<div class="log-meta">' + metaParts.join(' ・ ') + '</div>' +
+          commentHtml +
+        '</div>' +
+        '<button class="log-del" data-id="' + a.id + '" type="button">削除</button>';
+      logList.appendChild(el);
+    });
+    logMoreWrap.style.display = sorted.length > logShowCount ? "block" : "none";
+  }
+  logList.addEventListener("click", function(e){
+    var del = e.target.closest(".log-del");
+    var commentLink = e.target.closest(".log-comment-link");
+    if (del) {
+      var id = del.getAttribute("data-id");
+      proj.actions = proj.actions.filter(function(a){ return a.id !== id; });
+      saveState(); renderAll();
+      return;
+    }
+    if (commentLink) {
+      openCommentEditor(commentLink.getAttribute("data-id"));
+    }
+  });
+  logMoreBtn.addEventListener("click", function(){ logShowCount += LOG_PAGE; renderLogList(); });
+
+  function openCommentEditor(actionId){
+    var action = proj.actions.find(function(a){ return a.id === actionId; });
+    if (!action) return;
+    var overlay = document.createElement("div");
+    overlay.className = "overlay";
+    overlay.innerHTML =
+      '<div class="overlay-card">' +
+        '<div class="overlay-eyebrow">振り返り</div>' +
+        '<h2>' + escapeHtml(action.text) + '</h2>' +
+        '<p>実際にどこまでできたか、うまくいった点・つまずいた点など、あとで読み返して質を振り返れるように書いておけます。</p>' +
+        '<textarea id="commentInput" placeholder="例)予定していた半分までしか終わらなかった。集中が続いたのは最初の10分だけだった"></textarea>' +
+        '<div class="add-row">' +
+          '<button class="btn btn-primary" id="commentSave" type="button">保存する</button>' +
+          '<button class="btn" id="commentCancel" type="button">キャンセル</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    var ta = overlay.querySelector("#commentInput");
+    ta.value = action.comment || "";
+    ta.focus();
+    overlay.querySelector("#commentSave").addEventListener("click", function(){
+      action.comment = ta.value.trim();
+      saveState();
+      renderLogList();
+      document.body.removeChild(overlay);
+    });
+    overlay.querySelector("#commentCancel").addEventListener("click", function(){
+      document.body.removeChild(overlay);
+    });
+  }
+
+  // ---- export as JSON ----
+  (function initExport(){
+    if (typeof claude === "undefined" || !claude.use) return;
+    claude.use("downloads").then(function(downloads){
+      if (!downloads) return;
+      exportWrap.style.display = "";
+      exportBtn.addEventListener("click", function(){
+        var filename = "anti-vision-backup-" + todayStr() + ".json";
+        var data = JSON.stringify(state, null, 2);
+        downloads.save({ filename: filename, data: data }).catch(function(e){
+          console.error("export failed", e);
+        });
+      });
+    }).catch(function(e){ console.error("downloads capability unavailable", e); });
+  })();
+
+  resetBtn.addEventListener("click", function(){
+    openConfirmDialog("すべてのアンチビジョン・記録・統計を消去します。", function(){
+      state = JSON.parse(JSON.stringify(defaultState));
+      var p0 = makeProject({ title: "マイビジョン" });
+      state.projects = [p0];
+      state.activeProjectId = p0.id;
+      proj = p0;
+      try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(V2_KEY); localStorage.removeItem(LEGACY_KEY); } catch(e){}
+      saveState();
+      resetTransientFormState();
+      renderProjectTabs();
+      renderLogInfoContent();
+      renderAll();
+      openAntiVisionEditor(true);
+    });
+  });
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderCalendar, 200);
+  });
+
+  function renderAll(){
+    renderPlaque();
+    renderDashboard();
+    renderLogList();
+  }
+  renderAll();
+})();
+</script>
+</body>
+</html>
