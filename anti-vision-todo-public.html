@@ -21,6 +21,8 @@
     --ember-soft: #3a2418;
     --danger: #c24545;
     --teal: #4a8f7e;
+    --emerald: #10b981;
+    --emerald-hover: #0ea271;
     --teal-2: #3a6f63;
     --teal-3: #295049;
     --teal-soft: #1c3630;
@@ -45,6 +47,8 @@
     --teal-2: #6ba496;
     --teal-3: #b6d6cc;
     --teal-soft: #d9e8e2;
+    --emerald: #0da271;
+    --emerald-hover: #0b8a60;
     color-scheme: light;
   }
   @media (prefers-color-scheme: light) {
@@ -52,6 +56,7 @@
       --bg: #f2efe9; --panel: #ffffff; --panel-2: #ece8e0; --border: #d8d2c6; --border-soft: #e3ded3;
       --text: #201f1c; --text-muted: #6b675f; --text-faint: #716d5b; --ember: #b8481a; --ember-soft: #f2ddce;
       --danger: #a83a3a; --teal: #2f6d5c; --teal-2: #6ba496; --teal-3: #b6d6cc; --teal-soft: #d9e8e2;
+      --emerald: #0da271; --emerald-hover: #0b8a60;
       color-scheme: light;
     }
   }
@@ -67,6 +72,7 @@
   }
   .frame { max-width: 680px; margin: 0 auto; padding: 40px 20px 100px; }
   .topbar { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 32px; gap: 12px; }
+  .topbar-btns { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .brand { font-family: 'Shippori Mincho', serif; font-weight: 600; font-size: 19px; letter-spacing: 0.02em; }
   .brand small { display: block; font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 11px; color: var(--text-faint); font-weight: 400; margin-top: 2px; }
   .theme-toggle { background: none; border: 1px solid var(--border); color: var(--text-muted); border-radius: var(--radius); padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: inherit; flex-shrink: 0; }
@@ -171,8 +177,9 @@
   .log-del { background: none; border: none; color: var(--text-faint); font-size: 11px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; padding: 0; font-family: inherit; flex-shrink: 0; }
   .log-del:hover { color: var(--danger); }
   .empty-state { text-align: center; padding: 26px 10px; color: var(--text-faint); font-size: 13px; border: 1px dashed var(--border); border-radius: var(--radius); }
-  .log-more { text-align: center; margin-top: 10px; }
-  .log-more button { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; font-family: inherit; }
+  .log-more { text-align: center; margin: 4px 0 20px; }
+  .log-more button { background: none; border: 1px solid var(--emerald); color: var(--emerald); font-size: 13px; font-weight: 700; padding: 9px 20px; border-radius: 20px; cursor: pointer; font-family: inherit; }
+  .log-more button:hover { background: var(--emerald); color: #fff; }
 
   .reset-line { text-align: center; margin-top: 30px; }
   .reset-line button { background: none; border: none; color: var(--text-faint); font-size: 11px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font-family: inherit; }
@@ -217,6 +224,12 @@
   .overlay-card.settings-card { max-width: 440px; }
   .motivation-note-input { width: 100%; min-height: 80px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 13px; line-height: 1.7; padding: 9px 11px; border-radius: var(--radius); resize: vertical; }
 
+  .history-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+  .history-title { font-family: 'Shippori Mincho', serif; font-size: 18px; font-weight: 600; }
+  .week-group { margin-bottom: 28px; }
+  .week-group-header { font-size: 12.5px; color: var(--text-muted); font-weight: 700; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border-soft); display: flex; justify-content: space-between; align-items: baseline; }
+  .week-group-count { color: var(--text-faint); font-weight: 400; font-size: 11px; }
+
   @media (max-width: 480px) {
     .frame { padding: 28px 16px 90px; }
     .plaque-text { font-size: 16px; }
@@ -226,50 +239,55 @@
 <body>
 <div class="frame">
 
+  <div id="mainView">
+
   <div class="topbar">
-    <div class="brand">Anti-Vision<small>避けたい未来に、行動で応える</small></div>
-    <button class="theme-toggle" id="themeToggle" type="button">表示切替</button>
+    <div class="brand">Anti-Vision<small data-i18n="brandTagline">避けたい未来に、行動で応える</small></div>
+    <div class="topbar-btns">
+      <button class="theme-toggle" id="langToggle" type="button">EN</button>
+      <button class="theme-toggle" id="themeToggle" type="button" data-i18n="themeToggle">表示切替</button>
+    </div>
   </div>
 
   <div class="project-tabs" id="projectTabs"></div>
 
   <div class="plaque" id="plaque">
-    <div class="plaque-label">もし、このまま何もしなければ</div>
-    <div class="plaque-text empty" id="plaqueText">まだ何も刻まれていません。下のボタンから、避けたい未来を書いてください。</div>
-    <button class="plaque-edit" id="plaqueEditBtn" type="button">書き直す</button>
+    <div class="plaque-label" data-i18n="plaqueLabel">もし、このまま何もしなければ</div>
+    <div class="plaque-text empty" id="plaqueText" data-i18n="plaqueEmpty">まだ何も刻まれていません。下のボタンから、避けたい未来を書いてください。</div>
+    <button class="plaque-edit" id="plaqueEditBtn" type="button" data-i18n="plaqueEdit">書き直す</button>
     <div class="warn-strip" id="warnStrip"></div>
   </div>
 
   <div class="commitment">
     <div class="commitment-label-wrap">
-      <span>代償の宣言:</span>
-      <button class="info-btn" id="commitInfoBtn" type="button" aria-label="説明を見る">?</button>
+      <span data-i18n="commitLabel">代償の宣言:</span>
+      <button class="info-btn" id="commitInfoBtn" type="button" aria-label="説明を見る" data-i18n-aria="infoAria">?</button>
       <div class="info-bubble" id="commitInfoBubble">
         <div class="info-bubble-arrow"></div>
-        <p><strong>アンチビジョン</strong>が「このまま何も変えなければ訪れる、遠い未来」だとしたら、<strong>代償の宣言</strong>はもっと近い距離感の一文です。「今日これをやらなかったら、今日中にどうなるか」を先に言葉にしておきます。</p>
+        <p data-i18n-html="commitInfoP1"><strong>アンチビジョン</strong>が「このまま何も変えなければ訪れる、遠い未来」だとしたら、<strong>代償の宣言</strong>はもっと近い距離感の一文です。「今日これをやらなかったら、今日中にどうなるか」を先に言葉にしておきます。</p>
         <ul>
-          <li>今日やらなければ、明日の自分に言い訳することになる</li>
-          <li>サボったら、今夜は罪悪感で何も楽しめない</li>
-          <li>今日抜けたら、決めたばかりの記録が1日目で途切れる</li>
+          <li data-i18n="commitInfoLi1">今日やらなければ、明日の自分に言い訳することになる</li>
+          <li data-i18n="commitInfoLi2">サボったら、今夜は罪悪感で何も楽しめない</li>
+          <li data-i18n="commitInfoLi3">今日抜けたら、決めたばかりの記録が1日目で途切れる</li>
         </ul>
-        <p class="info-bubble-hint">空欄のままでも使えます。</p>
+        <p class="info-bubble-hint" data-i18n="commitInfoHint">空欄のままでも使えます。</p>
       </div>
     </div>
-    <input id="commitmentInput" placeholder="例)今日やらなければ、明日の自分に説明できない" maxlength="80">
+    <input id="commitmentInput" placeholder="例)今日やらなければ、明日の自分に説明できない" maxlength="80" data-i18n-ph="commitPlaceholder">
   </div>
 
-  <div class="dash-head">継続ダッシュボード</div>
+  <div class="dash-head" data-i18n="dashHead">継続ダッシュボード</div>
 
   <div class="dash-panel">
     <div class="cal-header">
-      <button class="cal-nav" id="calPrev" type="button" aria-label="前月">‹</button>
+      <button class="cal-nav" id="calPrev" type="button" aria-label="前月" data-i18n-aria="calPrevAria">‹</button>
       <div class="cal-month-title" id="calMonthTitle"></div>
-      <button class="cal-nav" id="calNext" type="button" aria-label="次月">›</button>
+      <button class="cal-nav" id="calNext" type="button" aria-label="次月" data-i18n-aria="calNextAria">›</button>
     </div>
     <div class="cal-weekday-row" id="calWeekdayRow"></div>
     <div class="cal-grid" id="calGrid"></div>
     <div class="cal-legend">
-      <span>行動なし</span>
+      <span data-i18n="calLegendNone">行動なし</span>
       <div class="cal-cell"></div>
       <div class="cal-cell lvl-1"></div>
       <div class="cal-cell lvl-2"></div>
@@ -279,18 +297,18 @@
   </div>
 
   <div class="stat-grid">
-    <div class="stat"><div class="stat-num" id="statStreak">0</div><div class="stat-label">連続継続日数</div></div>
-    <div class="stat"><div class="stat-num" id="statBest">0</div><div class="stat-label">最長記録</div></div>
-    <div class="stat"><div class="stat-num" id="statRate">0%</div><div class="stat-label">継続率(開始日から)</div></div>
-    <div class="stat"><div class="stat-num" id="statTotalTime">0</div><div class="stat-label">合計時間</div></div>
-    <div class="stat"><div class="stat-num" id="stat7Time">0</div><div class="stat-label">直近7日の時間</div></div>
-    <div class="stat"><div class="stat-num" id="statQuality">–</div><div class="stat-label">平均クオリティ(30日)</div></div>
+    <div class="stat"><div class="stat-num" id="statStreak">0</div><div class="stat-label" data-i18n="statStreak">連続継続日数</div></div>
+    <div class="stat"><div class="stat-num" id="statBest">0</div><div class="stat-label" data-i18n="statBest">最長記録</div></div>
+    <div class="stat"><div class="stat-num" id="statRate">0%</div><div class="stat-label" data-i18n="statRate">継続率(開始日から)</div></div>
+    <div class="stat"><div class="stat-num" id="statTotalTime">0</div><div class="stat-label" data-i18n="statTotalTime">合計時間</div></div>
+    <div class="stat"><div class="stat-num" id="stat7Time">0</div><div class="stat-label" data-i18n="stat7Time">直近7日の時間</div></div>
+    <div class="stat"><div class="stat-num" id="statQuality">–</div><div class="stat-label" data-i18n="statQuality">平均クオリティ(30日)</div></div>
   </div>
 
   <div class="section-head">
     <div class="commitment-label-wrap">
-      <span>今日、何をしたか</span>
-      <button class="info-btn" id="logInfoBtn" type="button" aria-label="説明を見る">?</button>
+      <span data-i18n="sectionHeadToday">今日、何をしたか</span>
+      <button class="info-btn" id="logInfoBtn" type="button" aria-label="説明を見る" data-i18n-aria="infoAria">?</button>
       <div class="info-bubble" id="logInfoBubble">
         <div class="info-bubble-arrow"></div>
         <div id="logInfoContent"></div>
@@ -299,53 +317,304 @@
   </div>
 
   <div class="log-form">
-    <label>行動(具体的に何をしたか)</label>
-    <input type="text" id="inputText" placeholder="例)確定申告の書類を3枚分けて封筒にまとめた" maxlength="80">
-    <label>カテゴリ(任意)</label>
+    <label data-i18n="actionLabel">行動(具体的に何をしたか)</label>
+    <input type="text" id="inputText" placeholder="例)確定申告の書類を3枚分けて封筒にまとめた" maxlength="80" data-i18n-ph="actionPlaceholder">
+    <label data-i18n="categoryLabel">カテゴリ(任意)</label>
     <div class="chip-group" id="taskCategoryChips"></div>
-    <label>場所(任意)</label>
+    <label data-i18n="locationLabel">場所(任意)</label>
     <div class="chip-group" id="locationChips"></div>
-    <label>かかった時間(任意)</label>
+    <label data-i18n="timeLabel">かかった時間(任意)</label>
     <div class="timer-row">
-      <button class="btn" id="timerToggleBtn" type="button">⏱ 計測開始</button>
+      <button class="btn" id="timerToggleBtn" type="button" data-i18n="timerStart">⏱ 計測開始</button>
       <span class="timer-display" id="timerDisplay">00:00</span>
     </div>
-    <div class="timer-hint">計測すると、下のボタンの代わりに実際の経過時間が記録されます</div>
-    <div class="time-tier-label">小さな一歩</div>
+    <div class="timer-hint" data-i18n="timerHint">計測すると、下のボタンの代わりに実際の経過時間が記録されます</div>
+    <div class="time-tier-label" data-i18n="tierSmall">小さな一歩</div>
     <div class="chip-group" id="timeChips">
-      <button class="chip" data-min="1" type="button">1分</button>
-      <button class="chip" data-min="2" type="button">2分</button>
-      <button class="chip" data-min="3" type="button">3分</button>
-      <button class="chip" data-min="4" type="button">4分</button>
-      <button class="chip" data-min="5" type="button">5分</button>
+      <button class="chip" data-min="1" type="button">1<span data-i18n="minUnit">分</span></button>
+      <button class="chip" data-min="2" type="button">2<span data-i18n="minUnit">分</span></button>
+      <button class="chip" data-min="3" type="button">3<span data-i18n="minUnit">分</span></button>
+      <button class="chip" data-min="4" type="button">4<span data-i18n="minUnit">分</span></button>
+      <button class="chip" data-min="5" type="button">5<span data-i18n="minUnit">分</span></button>
     </div>
-    <div class="time-tier-label">がっつり</div>
+    <div class="time-tier-label" data-i18n="tierBig">がっつり</div>
     <div class="chip-group" id="timeChipsBig">
-      <button class="chip" data-min="10" type="button">10分</button>
-      <button class="chip" data-min="30" type="button">30分</button>
-      <button class="chip" data-min="60" type="button">60分+</button>
+      <button class="chip" data-min="10" type="button">10<span data-i18n="minUnit">分</span></button>
+      <button class="chip" data-min="30" type="button">30<span data-i18n="minUnit">分</span></button>
+      <button class="chip" data-min="60" type="button">60<span data-i18n="minUnitPlus">分+</span></button>
     </div>
-    <label>取り組みの深さ</label>
+    <label data-i18n="qualityLabel">取り組みの深さ</label>
     <div class="chip-group" id="qualityChips"></div>
-    <label>振り返り(任意)</label>
-    <textarea id="inputComment" placeholder="例)予定していた半分までしか終わらなかった。集中が続いたのは最初の10分だけだった" maxlength="500"></textarea>
+    <label data-i18n="commentLabel">振り返り(任意)</label>
+    <textarea id="inputComment" placeholder="例)予定していた半分までしか終わらなかった。集中が続いたのは最初の10分だけだった" maxlength="500" data-i18n-ph="commentPlaceholder"></textarea>
     <div class="add-row">
-      <button class="btn btn-primary" id="addBtn" type="button">記録する</button>
-      <button class="btn" id="openSettingsBtn" type="button">カテゴリを管理</button>
+      <button class="btn btn-primary" id="addBtn" type="button" data-i18n="addBtn">記録する</button>
+      <button class="btn" id="openSettingsBtn" type="button" data-i18n="settingsBtn">カテゴリを管理</button>
     </div>
   </div>
 
+  <div class="log-more" id="logMoreWrap" style="display:none;"><button id="logMoreBtn" type="button" data-i18n="viewHistory">全履歴を見る</button></div>
   <div id="logList"></div>
-  <div class="empty-state" id="emptyState" style="display:none;">まだ記録がありません。今日やったことを、ひとつ記録してみてください。</div>
-  <div class="log-more" id="logMoreWrap" style="display:none;"><button id="logMoreBtn" type="button">もっと見る</button></div>
+  <div class="empty-state" id="emptyState" style="display:none;" data-i18n="emptyState">まだ記録がありません。今日やったことを、ひとつ記録してみてください。</div>
 
-  <div class="reset-line"><span id="exportWrap" style="display:none;"><button id="exportBtn" type="button">データをJSONで書き出す</button> ・ </span><button id="resetBtn" type="button">すべてのデータを消去する</button></div>
+  <div class="reset-line"><span id="exportWrap" style="display:none;"><button id="exportBtn" type="button" data-i18n="exportBtn">データをJSONで書き出す</button> ・ </span><button id="resetBtn" type="button" data-i18n="resetBtnLabel">すべてのデータを消去する</button></div>
+
+  </div><!-- /mainView -->
+
+  <div id="historyView" style="display:none;">
+    <div class="history-header">
+      <button class="btn" id="historyBackBtn" type="button" data-i18n="back">‹ 戻る</button>
+      <div class="history-title" id="historyTitle" data-i18n="allHistory">全履歴</div>
+    </div>
+    <div id="historyList"></div>
+  </div>
 
 </div>
 
 <script>
 (function(){
   "use strict";
+
+  // ---- i18n ----
+  var STRINGS = {
+    ja: {
+      brandTagline: "避けたい未来に、行動で応える",
+      themeToggle: "表示切替",
+      langToggle: "EN",
+      infoAria: "説明を見る",
+      plaqueLabel: "もし、このまま何もしなければ",
+      plaqueEmpty: "まだ何も刻まれていません。下のボタンから、避けたい未来を書いてください。",
+      plaqueEdit: "書き直す",
+      warnStrip: "今日はまだ何も記録されていません。このまま眠れば、上の未来に一日分近づきます。",
+      commitLabel: "代償の宣言:",
+      commitInfoP1: '<strong>アンチビジョン</strong>が「このまま何も変えなければ訪れる、遠い未来」だとしたら、<strong>代償の宣言</strong>はもっと近い距離感の一文です。「今日これをやらなかったら、今日中にどうなるか」を先に言葉にしておきます。',
+      commitInfoLi1: "今日やらなければ、明日の自分に言い訳することになる",
+      commitInfoLi2: "サボったら、今夜は罪悪感で何も楽しめない",
+      commitInfoLi3: "今日抜けたら、決めたばかりの記録が1日目で途切れる",
+      commitInfoHint: "空欄のままでも使えます。",
+      commitPlaceholder: "例)今日やらなければ、明日の自分に説明できない",
+      dashHead: "継続ダッシュボード",
+      calPrevAria: "前月",
+      calNextAria: "次月",
+      calLegendNone: "行動なし",
+      calLegendMaxSuffix: "行動",
+      calTooltipHas: "件の記録",
+      calTooltipNone: "記録なし",
+      statStreak: "連続継続日数",
+      statBest: "最長記録",
+      statRate: "継続率(開始日から)",
+      statTotalTime: "合計時間",
+      stat7Time: "直近7日の時間",
+      statQuality: "平均クオリティ(30日)",
+      sectionHeadToday: "今日、何をしたか",
+      actionLabel: "行動(具体的に何をしたか)",
+      actionPlaceholder: "例)確定申告の書類を3枚分けて封筒にまとめた",
+      categoryLabel: "カテゴリ(任意)",
+      locationLabel: "場所(任意)",
+      timeLabel: "かかった時間(任意)",
+      timerStart: "⏱ 計測開始",
+      timerStop: "⏹ 計測終了",
+      timerHint: "計測すると、下のボタンの代わりに実際の経過時間が記録されます",
+      timerUnderMin: "1分未満のため時間は記録されません",
+      timerWillLog: "分を記録します",
+      tierSmall: "小さな一歩",
+      tierBig: "がっつり",
+      minUnit: "分",
+      minUnitPlus: "分+",
+      qualityLabel: "取り組みの深さ",
+      commentLabel: "振り返り(任意)",
+      commentPlaceholder: "例)予定していた半分までしか終わらなかった。集中が続いたのは最初の10分だけだった",
+      addBtn: "記録する",
+      settingsBtn: "カテゴリを管理",
+      emptyState: "まだ記録がありません。今日やったことを、ひとつ記録してみてください。",
+      logMore: "もっと見る",
+      viewHistory: "全履歴を見る",
+      back: "‹ 戻る",
+      allHistory: "全履歴",
+      entriesSuffix: "件",
+      weekRangeFormat: function(startD, endD){
+        var f = function(d){ return (d.getMonth()+1) + "月" + d.getDate() + "日"; };
+        return f(startD) + " - " + f(endD);
+      },
+      historyEmpty: "この期間の記録はありません。",
+      exportBtn: "データをJSONで書き出す",
+      resetBtnLabel: "すべてのデータを消去する",
+      catManageAria: "説明を見る",
+      dragReorderAria: "ドラッグで並び替え",
+      minutesSuffix: "分",
+      hourUnit: "時間",
+      qLight: "軽く", qNormal: "ふつう", qDeep: "しっかり",
+      // dynamic / JS-built strings
+      logComment: "振り返りを書く",
+      logCommentEdit: "振り返りを編集",
+      logEdit: "編集",
+      editEntryEyebrow: "編集",
+      editMinutesLabel: "時間(分)",
+      logDel: "削除",
+      onboardEyebrow: "はじめに",
+      editEyebrow: "書き直す",
+      onboardH2: "避けたい未来を、先に見ておく",
+      editH2: "アンチビジョンを編集",
+      onboardP: "理想の未来を描く代わりに、今のまま何も変えなかったら訪れる未来を、できるだけ具体的に書いてください。1つだけ、半年後か1年後の場面で構いません。",
+      editP: "今のまま何も変えなかったら訪れる、避けたい未来を書き直してください。",
+      avPlaceholder: "例)1年後も同じ場所にいて、あの時始めていればと思っている。",
+      avHint: "抽象的な言葉より、場面が思い浮かぶ具体的な描写のほうが効きます。",
+      avTitleLabel: "タブに出す短い名前(任意)",
+      avTitlePlaceholder: "例)副業を始める",
+      save: "保存する",
+      cancel: "キャンセル",
+      close: "閉じる",
+      addBtnShort: "追加",
+      projManageAdd: "新しいアンチビジョンを追加",
+      projManage: "管理",
+      projUntitled: "(未設定)",
+      projSettingsEyebrow: "設定",
+      projSettingsH2: "アンチビジョンを管理",
+      projSettingsP: "タブに出す名前を変更したり、使わなくなったものを削除できます。記録・カレンダーもまとめて削除されるので注意してください。",
+      catSettingsH2: "カテゴリを管理",
+      catTaskTitle: "タスクのカテゴリ",
+      catTaskPh: "例)副業",
+      catLocTitle: "場所のカテゴリ",
+      catLocPh: "例)実家",
+      catQualityTitle: "取り組みの深さ(追加・削除・名前の変更ができます。上ほど軽く、下ほど深い扱いになります)",
+      catQualityPh: "例)がっつり",
+      catEmpty: "まだありません",
+      catEmptyHint: "まだカテゴリがありません。「カテゴリを管理」から追加できます。",
+      motivationTitle: "格言・モチベーションメモ(任意)",
+      motivationPh: "例)好きな言葉や、自分への合言葉を書いておけます",
+      motivationEmpty: "まだ何も設定されていません。「カテゴリを管理」から、自分の好きな言葉やモットーを登録できます。",
+      commentEyebrow: "振り返り",
+      commentP: "実際にどこまでできたか、うまくいった点・つまずいた点など、あとで読み返して質を振り返れるように書いておけます。",
+      commentPh: "例)予定していた半分までしか終わらなかった。集中が続いたのは最初の10分だけだった",
+      confirmEyebrow: "確認",
+      confirmH2: "本当によろしいですか?",
+      confirmDelete: "削除する",
+      resetConfirm: "すべてのアンチビジョン・記録・統計を消去します。",
+      projDeleteConfirm: "の記録・カレンダーもすべて削除します。",
+      weekdays: ["月","火","水","木","金","土","日"],
+      monthFormat: function(y,m){ return y + "年" + (m+1) + "月"; }
+    },
+    en: {
+      brandTagline: "Face the future you want to avoid",
+      themeToggle: "Theme",
+      langToggle: "日本語",
+      infoAria: "View explanation",
+      plaqueLabel: "If nothing changes...",
+      plaqueEmpty: "Nothing written yet. Use the button below to write the future you want to avoid.",
+      plaqueEdit: "Edit",
+      warnStrip: "Nothing logged yet today. If you sleep on it, you'll be one day closer to the future above.",
+      commitLabel: "Stakes declaration:",
+      commitInfoP1: 'If the <strong>Anti-Vision</strong> is "the distant future that arrives if nothing changes," the <strong>stakes declaration</strong> is a closer, same-day version: put into words what happens today if you skip this today.',
+      commitInfoLi1: "If I skip this today, I'll have to make excuses to tomorrow's me",
+      commitInfoLi2: "If I slack off, guilt will ruin my evening",
+      commitInfoLi3: "If I miss today, my brand-new streak ends on day one",
+      commitInfoHint: "Works fine left blank too.",
+      commitPlaceholder: "e.g. If I skip this today, I'll have to explain it to tomorrow's me",
+      dashHead: "Continuity dashboard",
+      calPrevAria: "Previous month",
+      calNextAria: "Next month",
+      calLegendNone: "No activity",
+      calLegendMaxSuffix: " activity",
+      calTooltipHas: " entries",
+      calTooltipNone: "no entries",
+      statStreak: "Current streak",
+      statBest: "Best streak",
+      statRate: "Continuity (since start)",
+      statTotalTime: "Total time",
+      stat7Time: "Last 7 days",
+      statQuality: "Avg. quality (30d)",
+      sectionHeadToday: "What did you do today",
+      actionLabel: "Action (what exactly did you do)",
+      actionPlaceholder: "e.g. Sorted 3 tax documents into envelopes",
+      categoryLabel: "Category (optional)",
+      locationLabel: "Location (optional)",
+      timeLabel: "Time spent (optional)",
+      timerStart: "⏱ Start timer",
+      timerStop: "⏹ Stop timer",
+      timerHint: "Timing records the actual elapsed time instead of the buttons below",
+      timerUnderMin: "Under 1 minute — time won't be recorded",
+      timerWillLog: " min will be logged",
+      tierSmall: "Small step",
+      tierBig: "Deep dive",
+      minUnit: "m",
+      minUnitPlus: "m+",
+      qualityLabel: "Depth of effort",
+      commentLabel: "Reflection (optional)",
+      commentPlaceholder: "e.g. Only got halfway through what I planned. Focus lasted about 10 minutes.",
+      addBtn: "Log it",
+      settingsBtn: "Manage categories",
+      emptyState: "No records yet. Try logging one thing you did today.",
+      logMore: "Show more",
+      viewHistory: "View all history",
+      back: "‹ Back",
+      allHistory: "All history",
+      entriesSuffix: " entries",
+      weekRangeFormat: function(startD, endD){
+        var MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        var f = function(d){ return MN[d.getMonth()] + " " + d.getDate(); };
+        return f(startD) + " - " + f(endD);
+      },
+      historyEmpty: "No records in this period.",
+      exportBtn: "Export data as JSON",
+      resetBtnLabel: "Erase all data",
+      catManageAria: "View explanation",
+      dragReorderAria: "Drag to reorder",
+      minutesSuffix: "m",
+      hourUnit: "h",
+      qLight: "Light", qNormal: "Normal", qDeep: "Deep",
+      logComment: "Add reflection",
+      logCommentEdit: "Edit reflection",
+      logEdit: "Edit",
+      editEntryEyebrow: "Edit",
+      editMinutesLabel: "Time (minutes)",
+      logDel: "Delete",
+      onboardEyebrow: "Getting started",
+      editEyebrow: "Edit",
+      onboardH2: "See the avoided future first",
+      editH2: "Edit your Anti-Vision",
+      onboardP: "Instead of picturing your ideal future, write down — as concretely as you can — what happens if nothing changes. One scene, six months or a year out, is enough.",
+      editP: "Rewrite the avoided future that arrives if nothing changes.",
+      avPlaceholder: "e.g. A year from now I'm in the same place, wishing I'd started back then.",
+      avHint: "A concrete scene works better than an abstract statement.",
+      avTitleLabel: "Short name for the tab (optional)",
+      avTitlePlaceholder: "e.g. Start a side project",
+      save: "Save",
+      cancel: "Cancel",
+      close: "Close",
+      addBtnShort: "Add",
+      projManageAdd: "Add a new Anti-Vision",
+      projManage: "Manage",
+      projUntitled: "(untitled)",
+      projSettingsEyebrow: "Settings",
+      projSettingsH2: "Manage Anti-Visions",
+      projSettingsP: "Rename what shows on the tab, or delete ones you no longer use. Deleting also removes that Anti-Vision's log and calendar, so be careful.",
+      catSettingsH2: "Manage categories",
+      catTaskTitle: "Task categories",
+      catTaskPh: "e.g. Side project",
+      catLocTitle: "Location categories",
+      catLocPh: "e.g. Parents' house",
+      catQualityTitle: "Depth of effort (add, delete, and rename freely. Higher = lighter, lower = deeper)",
+      catQualityPh: "e.g. All-out",
+      catEmpty: "None yet",
+      catEmptyHint: "No categories yet. Add one from \"Manage categories.\"",
+      motivationTitle: "Quote / motivation note (optional)",
+      motivationPh: "e.g. A favorite quote or personal motto",
+      motivationEmpty: "Nothing set yet. Add your own quote or motto from \"Manage categories.\"",
+      commentEyebrow: "Reflection",
+      commentP: "Write down how far you actually got, what worked, what didn't — something to read back later and judge the quality of the effort.",
+      commentPh: "e.g. Only got halfway through what I planned. Focus lasted about 10 minutes.",
+      confirmEyebrow: "Confirm",
+      confirmH2: "Are you sure?",
+      confirmDelete: "Delete",
+      resetConfirm: "This will erase every Anti-Vision, log, and statistic.",
+      projDeleteConfirm: "will have its log and calendar deleted too.",
+      weekdays: ["Mo","Tu","We","Th","Fr","Sa","Su"],
+      monthFormat: function(y,m){ var MN=["January","February","March","April","May","June","July","August","September","October","November","December"]; return MN[m] + " " + y; }
+    }
+  };
+  var currentLang = "ja";
+  function t(key){ return (STRINGS[currentLang] && STRINGS[currentLang][key] !== undefined) ? STRINGS[currentLang][key] : (STRINGS.ja[key] !== undefined ? STRINGS.ja[key] : key); }
+
   var STORAGE_KEY = "anti-vision-todo-state-v3";
   var V2_KEY = "anti-vision-todo-state-v2";
   var LEGACY_KEY = "anti-vision-todo-state-v1";
@@ -364,6 +633,7 @@
     projects: [],
     activeProjectId: null,
     theme: null,
+    lang: null,
     locationCategories: ["自宅", "オフィス", "カフェ", "移動中"],
     taskCategories: ["仕事", "学習", "健康", "家事"],
     qualityLevels: [
@@ -372,6 +642,15 @@
       { id: "q_deep", label: "しっかり" }
     ],
     motivationNote: ""
+  };
+  var EN_SEED = {
+    locationCategories: ["Home", "Office", "Cafe", "Commute"],
+    taskCategories: ["Work", "Study", "Health", "Chores"],
+    qualityLevels: [
+      { id: "q_light", label: "Light" },
+      { id: "q_normal", label: "Normal" },
+      { id: "q_deep", label: "Deep" }
+    ]
   };
 
   function normalizeQualityLevels(raw){
@@ -436,6 +715,10 @@
     } catch(e){ return null; }
   }
 
+  function detectBrowserLang(){
+    var l = (typeof navigator !== "undefined" && navigator.language) ? navigator.language.toLowerCase() : "ja";
+    return l.indexOf("ja") === 0 ? "ja" : "en";
+  }
   function loadState(){
     try {
       var result;
@@ -445,15 +728,25 @@
         if (!loaded.projects || !loaded.projects.length) loaded.projects = [makeProject({ title: "マイビジョン" })];
         if (!loaded.projects.some(function(p){ return p.id === loaded.activeProjectId; })) loaded.activeProjectId = loaded.projects[0].id;
         if (!loaded.motivationNote) loaded.motivationNote = "";
+        if (!loaded.lang) loaded.lang = "ja";
         loaded.qualityLevels = normalizeQualityLevels(loaded.qualityLevels);
         result = loaded;
       } else {
         result = migrateFromV2() || migrateFromLegacyV1();
         if (!result) {
+          var lang = detectBrowserLang();
           result = JSON.parse(JSON.stringify(defaultState));
-          var p0 = makeProject({ title: "マイビジョン" });
+          result.lang = lang;
+          if (lang === "en") {
+            result.locationCategories = EN_SEED.locationCategories.slice();
+            result.taskCategories = EN_SEED.taskCategories.slice();
+            result.qualityLevels = JSON.parse(JSON.stringify(EN_SEED.qualityLevels));
+          }
+          var p0 = makeProject({ title: lang === "en" ? "My Vision" : "マイビジョン" });
           result.projects = [p0];
           result.activeProjectId = p0.id;
+        } else if (!result.lang) {
+          result.lang = "ja";
         }
       }
       normalizeAllActions(result);
@@ -461,6 +754,7 @@
     } catch(e){
       console.error("state load failed", e);
       var fallback = JSON.parse(JSON.stringify(defaultState));
+      fallback.lang = "ja";
       var pF = makeProject({ title: "マイビジョン" });
       fallback.projects = [pF];
       fallback.activeProjectId = pF.id;
@@ -470,6 +764,7 @@
   function saveState(){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){ console.error("state save failed", e); } }
 
   var state = loadState();
+  currentLang = state.lang || "ja";
   saveState();
   function getActiveProject(){
     return state.projects.find(function(p){ return p.id === state.activeProjectId; }) || state.projects[0];
@@ -486,6 +781,41 @@
     var cur = document.documentElement.getAttribute("data-theme");
     state.theme = cur === "dark" ? "light" : (cur === "light" ? null : "dark");
     applyTheme(); saveState();
+  });
+
+  // ---- language ----
+  function applyI18n(){
+    document.documentElement.lang = currentLang;
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n]"), function(el){
+      el.textContent = t(el.getAttribute("data-i18n"));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n-ph]"), function(el){
+      el.placeholder = t(el.getAttribute("data-i18n-ph"));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n-aria]"), function(el){
+      el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria")));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n-html]"), function(el){
+      el.innerHTML = t(el.getAttribute("data-i18n-html"));
+    });
+    var langBtn = document.getElementById("langToggle");
+    if (langBtn) langBtn.textContent = t("langToggle");
+  }
+  applyI18n();
+  document.getElementById("langToggle").addEventListener("click", function(){
+    currentLang = currentLang === "ja" ? "en" : "ja";
+    state.lang = currentLang;
+    saveState();
+    applyI18n();
+    renderCalWeekdayRow();
+    renderProjectTabs();
+    renderPlaque();
+    renderCalendar();
+    renderQualityChips();
+    renderLogInfoContent();
+    renderLogList();
+    renderDashboard();
+    if (historyView.style.display !== "none") renderHistoryList();
   });
 
   // ---- DOM refs ----
@@ -520,6 +850,10 @@
   var emptyState = document.getElementById("emptyState");
   var logMoreWrap = document.getElementById("logMoreWrap");
   var logMoreBtn = document.getElementById("logMoreBtn");
+  var mainView = document.getElementById("mainView");
+  var historyView = document.getElementById("historyView");
+  var historyBackBtn = document.getElementById("historyBackBtn");
+  var historyList = document.getElementById("historyList");
   var resetBtn = document.getElementById("resetBtn");
   var exportBtn = document.getElementById("exportBtn");
   var exportWrap = document.getElementById("exportWrap");
@@ -531,19 +865,18 @@
   function projectLabel(p){
     if (p.title && p.title.trim()) return p.title.trim();
     if (p.antiVision && p.antiVision.trim()) {
-      var t = p.antiVision.trim();
-      return t.length > 12 ? t.slice(0, 12) + "…" : t;
+      var av = p.antiVision.trim();
+      return av.length > 12 ? av.slice(0, 12) + "…" : av;
     }
-    return "(未設定)";
+    return t("projUntitled");
   }
   function resetTransientFormState(){
-    logShowCount = LOG_PAGE;
     calViewYear = (new Date()).getFullYear();
     calViewMonth = (new Date()).getMonth();
     selectedLocation = null;
     selectedTaskCategory = null;
     selectedMinutes = null;
-    selectedQuality = 2;
+    selectedQuality = defaultQualityId();
     inputText.value = "";
     inputComment.value = "";
     clearTimeChipActive();
@@ -589,14 +922,14 @@
     addBtn2.className = "project-tab-add";
     addBtn2.type = "button";
     addBtn2.textContent = "+";
-    addBtn2.setAttribute("aria-label", "新しいアンチビジョンを追加");
+    addBtn2.setAttribute("aria-label", t("projManageAdd"));
     addBtn2.addEventListener("click", createNewProject);
     projectTabs.appendChild(addBtn2);
 
     var manageBtn = document.createElement("button");
     manageBtn.className = "project-manage-btn";
     manageBtn.type = "button";
-    manageBtn.textContent = "管理";
+    manageBtn.textContent = t("projManage");
     manageBtn.addEventListener("click", openProjectSettings);
     projectTabs.appendChild(manageBtn);
   }
@@ -605,12 +938,12 @@
     overlay.className = "overlay";
     overlay.innerHTML =
       '<div class="overlay-card">' +
-        '<div class="overlay-eyebrow">確認</div>' +
-        '<h2>本当によろしいですか?</h2>' +
+        '<div class="overlay-eyebrow">' + escapeHtml(t("confirmEyebrow")) + '</div>' +
+        '<h2>' + escapeHtml(t("confirmH2")) + '</h2>' +
         '<p>' + escapeHtml(message) + '</p>' +
         '<div class="add-row">' +
-          '<button class="btn btn-primary" id="confirmYes" type="button">削除する</button>' +
-          '<button class="btn" id="confirmNo" type="button">キャンセル</button>' +
+          '<button class="btn btn-primary" id="confirmYes" type="button">' + escapeHtml(t("confirmDelete")) + '</button>' +
+          '<button class="btn" id="confirmNo" type="button">' + escapeHtml(t("cancel")) + '</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(overlay);
@@ -628,11 +961,11 @@
     overlay.className = "overlay";
     overlay.innerHTML =
       '<div class="overlay-card settings-card">' +
-        '<div class="overlay-eyebrow">設定</div>' +
-        '<h2>アンチビジョンを管理</h2>' +
-        '<p>タブに出す名前を変更したり、使わなくなったものを削除できます。記録・カレンダーもまとめて削除されるので注意してください。</p>' +
+        '<div class="overlay-eyebrow">' + escapeHtml(t("projSettingsEyebrow")) + '</div>' +
+        '<h2>' + escapeHtml(t("projSettingsH2")) + '</h2>' +
+        '<p>' + escapeHtml(t("projSettingsP")) + '</p>' +
         '<div id="projList"></div>' +
-        '<div class="add-row"><button class="btn btn-primary" id="projDone" type="button">閉じる</button></div>' +
+        '<div class="add-row"><button class="btn btn-primary" id="projDone" type="button">' + escapeHtml(t("close")) + '</button></div>' +
       '</div>';
     document.body.appendChild(overlay);
     var projList = overlay.querySelector("#projList");
@@ -655,11 +988,11 @@
         var del = document.createElement("button");
         del.className = "btn del";
         del.type = "button";
-        del.textContent = "削除";
+        del.textContent = t("logDel");
         del.disabled = state.projects.length <= 1;
         del.addEventListener("click", function(){
           if (state.projects.length <= 1) return;
-          openConfirmDialog('「' + projectLabel(p) + '」の記録・カレンダーもすべて削除します。', function(){
+          openConfirmDialog('"' + projectLabel(p) + '" ' + t("projDeleteConfirm"), function(){
             state.projects = state.projects.filter(function(x){ return x.id !== p.id; });
             if (state.activeProjectId === p.id) {
               state.activeProjectId = state.projects[0].id;
@@ -708,7 +1041,7 @@
     if (state.motivationNote && state.motivationNote.trim()) {
       el.innerHTML = '<p style="white-space:pre-wrap;">' + escapeHtml(state.motivationNote.trim()) + '</p>';
     } else {
-      el.innerHTML = '<p class="info-bubble-hint">まだ何も設定されていません。「カテゴリを管理」から、自分の好きな言葉やモットーを登録できます。</p>';
+      el.innerHTML = '<p class="info-bubble-hint">' + escapeHtml(t("motivationEmpty")) + '</p>';
     }
   }
   renderLogInfoContent();
@@ -718,14 +1051,14 @@
     if (proj.antiVision && proj.antiVision.trim()) {
       plaqueText.textContent = proj.antiVision; plaqueText.classList.remove("empty");
     } else {
-      plaqueText.textContent = "まだ何も刻まれていません。下のボタンから、避けたい未来を書いてください。"; plaqueText.classList.add("empty");
+      plaqueText.textContent = t("plaqueEmpty"); plaqueText.classList.add("empty");
     }
     var today = todayStr();
     var todayHas = proj.actions.some(function(a){ return a.date === today; });
     var hasAnyHistory = proj.actions.length > 0;
     var hour = new Date().getHours();
     if (hasAnyHistory && !todayHas && hour >= 18) {
-      warnStrip.textContent = "今日はまだ何も記録されていません。このまま眠れば、上の未来に一日分近づきます。";
+      warnStrip.textContent = t("warnStrip");
       warnStrip.classList.add("show");
     } else warnStrip.classList.remove("show");
   }
@@ -736,15 +1069,15 @@
     overlay.className = "overlay";
     overlay.innerHTML =
       '<div class="overlay-card">' +
-        '<div class="overlay-eyebrow">' + (isOnboarding ? "はじめに" : "書き直す") + '</div>' +
-        '<h2>' + (isOnboarding ? "避けたい未来を、先に見ておく" : "アンチビジョンを編集") + '</h2>' +
-        '<p>' + (isOnboarding ? "理想の未来を描く代わりに、今のまま何も変えなかったら訪れる未来を、できるだけ具体的に書いてください。1つだけ、半年後か1年後の場面で構いません。" : "今のまま何も変えなかったら訪れる、避けたい未来を書き直してください。") + '</p>' +
-        '<textarea id="avInput" placeholder="例)1年後も同じ場所にいて、あの時始めていればと思っている。"></textarea>' +
-        '<div class="overlay-hint">抽象的な言葉より、場面が思い浮かぶ具体的な描写のほうが効きます。</div>' +
-        '<label class="av-title-label">タブに出す短い名前(任意)</label>' +
-        '<input type="text" id="avTitleInput" class="av-title-input" placeholder="例)副業を始める" maxlength="16">' +
-        '<div class="add-row"><button class="btn btn-primary" id="avSave" type="button">保存する</button>' +
-          (isOnboarding ? '' : '<button class="btn" id="avCancel" type="button">キャンセル</button>') + '</div>' +
+        '<div class="overlay-eyebrow">' + escapeHtml(isOnboarding ? t("onboardEyebrow") : t("editEyebrow")) + '</div>' +
+        '<h2>' + escapeHtml(isOnboarding ? t("onboardH2") : t("editH2")) + '</h2>' +
+        '<p>' + escapeHtml(isOnboarding ? t("onboardP") : t("editP")) + '</p>' +
+        '<textarea id="avInput" placeholder="' + escapeHtml(t("avPlaceholder")) + '"></textarea>' +
+        '<div class="overlay-hint">' + escapeHtml(t("avHint")) + '</div>' +
+        '<label class="av-title-label">' + escapeHtml(t("avTitleLabel")) + '</label>' +
+        '<input type="text" id="avTitleInput" class="av-title-input" placeholder="' + escapeHtml(t("avTitlePlaceholder")) + '" maxlength="16">' +
+        '<div class="add-row"><button class="btn btn-primary" id="avSave" type="button">' + escapeHtml(t("save")) + '</button>' +
+          (isOnboarding ? '' : '<button class="btn" id="avCancel" type="button">' + escapeHtml(t("cancel")) + '</button>') + '</div>' +
       '</div>';
     document.body.appendChild(overlay);
     var ta = overlay.querySelector("#avInput");
@@ -804,10 +1137,11 @@
     return 3;
   }
   function formatMinutes(min){
-    if (!min) return "0分";
-    if (min < 60) return min + "分";
+    if (!min) return "0" + t("minUnit");
+    if (min < 60) return min + t("minUnit");
     var h = Math.floor(min/60), m = min % 60;
-    return m ? (h + "時間" + m + "分") : (h + "時間");
+    if (currentLang === "en") return m ? (h + t("hourUnit") + " " + m + t("minUnit")) : (h + t("hourUnit"));
+    return m ? (h + t("hourUnit") + m + t("minUnit")) : (h + t("hourUnit"));
   }
   function computeTime(){
     var total = 0, last7 = 0;
@@ -831,12 +1165,14 @@
   }
 
   // ---- calendar (month grid with paging) ----
-  var WEEKDAYS_JA = ["月","火","水","木","金","土","日"];
   var calViewYear = (new Date()).getFullYear();
   var calViewMonth = (new Date()).getMonth(); // 0-indexed
 
-  calWeekdayRow.innerHTML = "";
-  WEEKDAYS_JA.forEach(function(w){ var s = document.createElement("span"); s.textContent = w; calWeekdayRow.appendChild(s); });
+  function renderCalWeekdayRow(){
+    calWeekdayRow.innerHTML = "";
+    t("weekdays").forEach(function(w){ var s = document.createElement("span"); s.textContent = w; calWeekdayRow.appendChild(s); });
+  }
+  renderCalWeekdayRow();
 
   function renderCalendar(){
     var year = calViewYear, month = calViewMonth;
@@ -850,7 +1186,7 @@
     var days = [];
     for (var d = new Date(gridStart); d <= gridEnd; d = addDays(d, 1)) days.push(new Date(d));
 
-    calMonthTitle.textContent = year + "年" + (month + 1) + "月";
+    calMonthTitle.textContent = t("monthFormat")(year, month);
 
     var dayInfo = {};
     proj.actions.forEach(function(a){
@@ -869,7 +1205,7 @@
       if (info) lvl = qualityTier(info.qSum / info.count);
       var cell = document.createElement("div");
       cell.className = "cal-cell" + (lvl ? " lvl-" + lvl : "") + (ds === todayStrVal ? " today" : "") + (!inMonth ? " other-month" : "");
-      cell.title = ds + (info ? "(" + info.count + "件の記録)" : "(記録なし)");
+      cell.title = ds + " (" + (info ? info.count + t("calTooltipHas") : t("calTooltipNone")) + ")";
       var num = document.createElement("span");
       num.className = "cal-daynum";
       num.textContent = d.getDate();
@@ -912,7 +1248,7 @@
     if (!list.length) {
       var hint = document.createElement("span");
       hint.className = "cat-empty";
-      hint.textContent = "まだカテゴリがありません。「カテゴリを管理」から追加できます。";
+      hint.textContent = t("catEmptyHint");
       container.appendChild(hint);
       return;
     }
@@ -947,28 +1283,28 @@
     overlay.className = "overlay";
     overlay.innerHTML =
       '<div class="overlay-card settings-card">' +
-        '<div class="overlay-eyebrow">設定</div>' +
-        '<h2>カテゴリを管理</h2>' +
+        '<div class="overlay-eyebrow">' + escapeHtml(t("projSettingsEyebrow")) + '</div>' +
+        '<h2>' + escapeHtml(t("catSettingsH2")) + '</h2>' +
         '<div class="cat-section">' +
-          '<div class="cat-section-title">タスクのカテゴリ</div>' +
+          '<div class="cat-section-title">' + escapeHtml(t("catTaskTitle")) + '</div>' +
           '<div class="cat-chip-list" id="taskCatList"></div>' +
-          '<div class="cat-add-row"><input type="text" id="taskCatInput" placeholder="例)副業" maxlength="20"><button class="btn" id="taskCatAdd" type="button">追加</button></div>' +
+          '<div class="cat-add-row"><input type="text" id="taskCatInput" placeholder="' + escapeHtml(t("catTaskPh")) + '" maxlength="20"><button class="btn" id="taskCatAdd" type="button">' + escapeHtml(t("addBtnShort")) + '</button></div>' +
         '</div>' +
         '<div class="cat-section">' +
-          '<div class="cat-section-title">場所のカテゴリ</div>' +
+          '<div class="cat-section-title">' + escapeHtml(t("catLocTitle")) + '</div>' +
           '<div class="cat-chip-list" id="locCatList"></div>' +
-          '<div class="cat-add-row"><input type="text" id="locCatInput" placeholder="例)実家" maxlength="20"><button class="btn" id="locCatAdd" type="button">追加</button></div>' +
+          '<div class="cat-add-row"><input type="text" id="locCatInput" placeholder="' + escapeHtml(t("catLocPh")) + '" maxlength="20"><button class="btn" id="locCatAdd" type="button">' + escapeHtml(t("addBtnShort")) + '</button></div>' +
         '</div>' +
         '<div class="cat-section">' +
-          '<div class="cat-section-title">取り組みの深さ(追加・削除・名前の変更ができます。上ほど軽く、下ほど深い扱いになります)</div>' +
+          '<div class="cat-section-title">' + escapeHtml(t("catQualityTitle")) + '</div>' +
           '<div id="qualityLevelList"></div>' +
-          '<div class="cat-add-row"><input type="text" id="qLevelInput" placeholder="例)がっつり" maxlength="12"><button class="btn" id="qLevelAdd" type="button">追加</button></div>' +
+          '<div class="cat-add-row"><input type="text" id="qLevelInput" placeholder="' + escapeHtml(t("catQualityPh")) + '" maxlength="12"><button class="btn" id="qLevelAdd" type="button">' + escapeHtml(t("addBtnShort")) + '</button></div>' +
         '</div>' +
         '<div class="cat-section">' +
-          '<div class="cat-section-title">格言・モチベーションメモ(任意)</div>' +
-          '<textarea id="motivationNoteInput" class="motivation-note-input" placeholder="例)好きな言葉や、自分への合言葉を書いておけます" maxlength="400"></textarea>' +
+          '<div class="cat-section-title">' + escapeHtml(t("motivationTitle")) + '</div>' +
+          '<textarea id="motivationNoteInput" class="motivation-note-input" placeholder="' + escapeHtml(t("motivationPh")) + '" maxlength="400"></textarea>' +
         '</div>' +
-        '<div class="add-row"><button class="btn btn-primary" id="catDone" type="button">閉じる</button></div>' +
+        '<div class="add-row"><button class="btn btn-primary" id="catDone" type="button">' + escapeHtml(t("close")) + '</button></div>' +
       '</div>';
     document.body.appendChild(overlay);
 
@@ -980,7 +1316,7 @@
       arr.forEach(function(name, idx){
         var chip = document.createElement("span");
         chip.className = "cat-chip";
-        chip.innerHTML = '<span></span><button type="button" aria-label="削除">×</button>';
+        chip.innerHTML = '<span></span><button type="button" aria-label="' + escapeHtml(t("logDel")) + '">×</button>';
         chip.querySelector("span").textContent = name;
         chip.querySelector("button").addEventListener("click", function(){ onDelete(idx); });
         listEl.appendChild(chip);
@@ -988,7 +1324,7 @@
       if (!arr.length) {
         var e = document.createElement("span");
         e.className = "cat-empty";
-        e.textContent = "まだありません";
+        e.textContent = t("catEmpty");
         listEl.appendChild(e);
       }
     }
@@ -1039,7 +1375,7 @@
 
         var handle = document.createElement("span");
         handle.className = "drag-handle";
-        handle.setAttribute("aria-label", "ドラッグで並び替え");
+        handle.setAttribute("aria-label", t("dragReorderAria"));
         handle.textContent = "⋮⋮";
 
         function clearDragOverStates(){
@@ -1108,7 +1444,7 @@
         var del = document.createElement("button");
         del.className = "btn del";
         del.type = "button";
-        del.textContent = "削除";
+        del.textContent = t("logDel");
         del.disabled = state.qualityLevels.length <= 1;
         del.addEventListener("click", function(){
           if (state.qualityLevels.length <= 1) return;
@@ -1193,7 +1529,7 @@
     clearTimeChipActive();
     selectedMinutes = null;
     setTimeChipsDisabled(true);
-    timerToggleBtn.textContent = "⏹ 計測終了";
+    timerToggleBtn.textContent = t("timerStop");
     timerToggleBtn.classList.add("running");
     timerDisplay.classList.add("running");
     tickTimer();
@@ -1204,22 +1540,22 @@
     var elapsedSec = Math.floor((Date.now() - timerStartTs) / 1000);
     clearInterval(timerInterval); timerInterval = null;
     timerStartTs = null;
-    timerToggleBtn.textContent = "⏱ 計測開始";
+    timerToggleBtn.textContent = t("timerStart");
     timerToggleBtn.classList.remove("running");
     timerDisplay.classList.remove("running");
     if (elapsedSec < 60) {
       selectedMinutes = null;
-      timerDisplay.textContent = "1分未満のため時間は記録されません";
+      timerDisplay.textContent = t("timerUnderMin");
     } else {
       selectedMinutes = Math.round(elapsedSec / 60);
-      timerDisplay.textContent = selectedMinutes + "分を記録します";
+      timerDisplay.textContent = selectedMinutes + t("timerWillLog");
     }
     setTimeChipsDisabled(false);
   }
   function resetTimerDisplay(){
     timerStartTs = null;
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    timerToggleBtn.textContent = "⏱ 計測開始";
+    timerToggleBtn.textContent = t("timerStart");
     timerToggleBtn.classList.remove("running");
     timerDisplay.classList.remove("running");
     timerDisplay.textContent = "00:00";
@@ -1248,7 +1584,7 @@
       qualityChips.appendChild(btn);
     });
     var maxLabelEl = document.getElementById("calLegendMax");
-    if (maxLabelEl) maxLabelEl.textContent = (levels.length ? levels[levels.length - 1].label : "") + "行動";
+    if (maxLabelEl) maxLabelEl.textContent = (levels.length ? levels[levels.length - 1].label : "") + t("calLegendMaxSuffix");
   }
   qualityChips.addEventListener("click", function(e){
     var btn = e.target.closest(".chip");
@@ -1295,86 +1631,207 @@
 
   function escapeHtml(s){ return s.replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
 
-  var LOG_PAGE = 10;
-  var logShowCount = LOG_PAGE;
+  var LOG_PREVIEW_COUNT = 5;
 
   function formatTimeOfDay(iso){
     var d = new Date(iso);
     return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
   }
+  function buildLogItemEl(a){
+    var el = document.createElement("div");
+    el.className = "log-item";
+    var md = a.date.slice(5).replace("-", "/");
+    var metaParts = [];
+    if (a.category) metaParts.push(escapeHtml(a.category));
+    if (a.location) metaParts.push(escapeHtml(a.location));
+    if (a.minutes) metaParts.push(a.minutes + t("minutesSuffix"));
+    var qLabel = a.qualityLabel || "";
+    var qTier = qualityTier(a.qualityWeight);
+    if (qLabel) metaParts.push('<span class="q' + qTier + '">' + escapeHtml(qLabel) + '</span>');
+    var commentPreview = a.comment ? '<div class="log-comment-text">' + escapeHtml(a.comment) + '</div>' : '';
+    el.innerHTML =
+      '<div class="log-date">' + md + '<span class="log-time">' + formatTimeOfDay(a.createdAt) + '</span></div>' +
+      '<div class="log-body">' +
+        '<div class="log-text">' + escapeHtml(a.text) + '</div>' +
+        '<div class="log-meta">' + metaParts.join(' ・ ') + '</div>' +
+        commentPreview +
+        '<button class="log-comment-link" data-id="' + a.id + '" type="button">' + escapeHtml(t("logEdit")) + '</button>' +
+      '</div>' +
+      '<button class="log-del" data-id="' + a.id + '" type="button">' + escapeHtml(t("logDel")) + '</button>';
+    return el;
+  }
   function renderLogList(){
     var sorted = proj.actions.slice().sort(function(a,b){ return b.createdAt.localeCompare(a.createdAt); });
     emptyState.style.display = sorted.length ? "none" : "block";
-    var visible = sorted.slice(0, logShowCount);
+    var visible = sorted.slice(0, LOG_PREVIEW_COUNT);
     logList.innerHTML = "";
-    visible.forEach(function(a){
-      var el = document.createElement("div");
-      el.className = "log-item";
-      var md = a.date.slice(5).replace("-", "/");
-      var metaParts = [];
-      if (a.category) metaParts.push(escapeHtml(a.category));
-      if (a.location) metaParts.push(escapeHtml(a.location));
-      if (a.minutes) metaParts.push(a.minutes + "分");
-      var qLabel = a.qualityLabel || "";
-      var qTier = qualityTier(a.qualityWeight);
-      if (qLabel) metaParts.push('<span class="q' + qTier + '">' + escapeHtml(qLabel) + '</span>');
-      var commentHtml = a.comment
-        ? '<div class="log-comment-text">' + escapeHtml(a.comment) + '</div><button class="log-comment-link" data-id="' + a.id + '" type="button">振り返りを編集</button>'
-        : '<button class="log-comment-link" data-id="' + a.id + '" type="button">振り返りを書く</button>';
-      el.innerHTML =
-        '<div class="log-date">' + md + '<span class="log-time">' + formatTimeOfDay(a.createdAt) + '</span></div>' +
-        '<div class="log-body">' +
-          '<div class="log-text">' + escapeHtml(a.text) + '</div>' +
-          '<div class="log-meta">' + metaParts.join(' ・ ') + '</div>' +
-          commentHtml +
-        '</div>' +
-        '<button class="log-del" data-id="' + a.id + '" type="button">削除</button>';
-      logList.appendChild(el);
-    });
-    logMoreWrap.style.display = sorted.length > logShowCount ? "block" : "none";
+    visible.forEach(function(a){ logList.appendChild(buildLogItemEl(a)); });
+    logMoreWrap.style.display = sorted.length > 0 ? "block" : "none";
   }
-  logList.addEventListener("click", function(e){
+  function handleLogListClick(e){
     var del = e.target.closest(".log-del");
-    var commentLink = e.target.closest(".log-comment-link");
+    var editLink = e.target.closest(".log-comment-link");
     if (del) {
       var id = del.getAttribute("data-id");
       proj.actions = proj.actions.filter(function(a){ return a.id !== id; });
-      saveState(); renderAll();
+      saveState();
+      renderAll();
+      if (historyView.style.display !== "none") renderHistoryList();
       return;
     }
-    if (commentLink) {
-      openCommentEditor(commentLink.getAttribute("data-id"));
+    if (editLink) {
+      openEntryEditor(editLink.getAttribute("data-id"));
     }
-  });
-  logMoreBtn.addEventListener("click", function(){ logShowCount += LOG_PAGE; renderLogList(); });
+  }
+  logList.addEventListener("click", handleLogListClick);
+  historyList.addEventListener("click", handleLogListClick);
 
-  function openCommentEditor(actionId){
+  function getWeekStart(dateObj){
+    var dow = (dateObj.getDay() + 6) % 7; // Mon=0
+    return addDays(dateObj, -dow);
+  }
+  function renderHistoryList(){
+    var sorted = proj.actions.slice().sort(function(a,b){ return b.createdAt.localeCompare(a.createdAt); });
+    historyList.innerHTML = "";
+    if (!sorted.length) {
+      var empty = document.createElement("div");
+      empty.className = "empty-state";
+      empty.textContent = t("historyEmpty");
+      historyList.appendChild(empty);
+      return;
+    }
+    var groups = [];
+    var groupMap = {};
+    sorted.forEach(function(a){
+      var d = new Date(a.date + "T00:00:00");
+      var weekStart = getWeekStart(d);
+      var key = todayStr(weekStart);
+      if (!groupMap[key]) {
+        var g = { start: weekStart, end: addDays(weekStart, 6), items: [] };
+        groupMap[key] = g;
+        groups.push(g);
+      }
+      groupMap[key].items.push(a);
+    });
+    groups.forEach(function(g){
+      var section = document.createElement("div");
+      section.className = "week-group";
+      var header = document.createElement("div");
+      header.className = "week-group-header";
+      header.innerHTML = '<span>' + escapeHtml(t("weekRangeFormat")(g.start, g.end)) + '</span><span class="week-group-count">' + g.items.length + escapeHtml(t("entriesSuffix")) + '</span>';
+      section.appendChild(header);
+      g.items.forEach(function(a){ section.appendChild(buildLogItemEl(a)); });
+      historyList.appendChild(section);
+    });
+  }
+  function openHistoryView(){
+    mainView.style.display = "none";
+    historyView.style.display = "block";
+    renderHistoryList();
+    window.scrollTo(0, 0);
+  }
+  function closeHistoryView(){
+    historyView.style.display = "none";
+    mainView.style.display = "block";
+  }
+  logMoreBtn.addEventListener("click", openHistoryView);
+  historyBackBtn.addEventListener("click", closeHistoryView);
+
+  function openEntryEditor(actionId){
     var action = proj.actions.find(function(a){ return a.id === actionId; });
     if (!action) return;
     var overlay = document.createElement("div");
     overlay.className = "overlay";
     overlay.innerHTML =
       '<div class="overlay-card">' +
-        '<div class="overlay-eyebrow">振り返り</div>' +
+        '<div class="overlay-eyebrow">' + escapeHtml(t("editEntryEyebrow")) + '</div>' +
         '<h2>' + escapeHtml(action.text) + '</h2>' +
-        '<p>実際にどこまでできたか、うまくいった点・つまずいた点など、あとで読み返して質を振り返れるように書いておけます。</p>' +
-        '<textarea id="commentInput" placeholder="例)予定していた半分までしか終わらなかった。集中が続いたのは最初の10分だけだった"></textarea>' +
+        '<label class="av-title-label">' + escapeHtml(t("actionLabel")) + '</label>' +
+        '<input type="text" id="editTextInput" class="av-title-input" maxlength="80">' +
+        '<label class="av-title-label">' + escapeHtml(t("categoryLabel")) + '</label>' +
+        '<div class="chip-group" id="editCategoryChips"></div>' +
+        '<label class="av-title-label">' + escapeHtml(t("locationLabel")) + '</label>' +
+        '<div class="chip-group" id="editLocationChips"></div>' +
+        '<label class="av-title-label">' + escapeHtml(t("editMinutesLabel")) + '</label>' +
+        '<input type="number" id="editMinutesInput" class="av-title-input" min="0" max="999">' +
+        '<label class="av-title-label">' + escapeHtml(t("qualityLabel")) + '</label>' +
+        '<div class="chip-group" id="editQualityChips"></div>' +
+        '<label class="av-title-label">' + escapeHtml(t("commentLabel")) + '</label>' +
+        '<textarea id="editCommentInput" placeholder="' + escapeHtml(t("commentPh")) + '"></textarea>' +
         '<div class="add-row">' +
-          '<button class="btn btn-primary" id="commentSave" type="button">保存する</button>' +
-          '<button class="btn" id="commentCancel" type="button">キャンセル</button>' +
+          '<button class="btn btn-primary" id="editSave" type="button">' + escapeHtml(t("save")) + '</button>' +
+          '<button class="btn" id="editCancel" type="button">' + escapeHtml(t("cancel")) + '</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(overlay);
-    var ta = overlay.querySelector("#commentInput");
-    ta.value = action.comment || "";
-    ta.focus();
-    overlay.querySelector("#commentSave").addEventListener("click", function(){
-      action.comment = ta.value.trim();
+
+    overlay.querySelector("#editTextInput").value = action.text || "";
+    overlay.querySelector("#editMinutesInput").value = action.minutes || "";
+    overlay.querySelector("#editCommentInput").value = action.comment || "";
+
+    var editCategory = action.category || null;
+    var editLocation = action.location || null;
+    var matchLevel = state.qualityLevels.find(function(l){ return l.label === action.qualityLabel; });
+    var editQualityId = matchLevel ? matchLevel.id : (state.qualityLevels[0] ? state.qualityLevels[0].id : null);
+
+    function renderEditPickerChips(){
+      var catContainer = overlay.querySelector("#editCategoryChips");
+      catContainer.innerHTML = "";
+      state.taskCategories.forEach(function(name){
+        var btn = document.createElement("button");
+        btn.className = "chip" + (editCategory === name ? " active" : "");
+        btn.type = "button";
+        btn.textContent = name;
+        btn.addEventListener("click", function(){ editCategory = (editCategory === name) ? null : name; renderEditPickerChips(); });
+        catContainer.appendChild(btn);
+      });
+      var locContainer = overlay.querySelector("#editLocationChips");
+      locContainer.innerHTML = "";
+      state.locationCategories.forEach(function(name){
+        var btn = document.createElement("button");
+        btn.className = "chip" + (editLocation === name ? " active" : "");
+        btn.type = "button";
+        btn.textContent = name;
+        btn.addEventListener("click", function(){ editLocation = (editLocation === name) ? null : name; renderEditPickerChips(); });
+        locContainer.appendChild(btn);
+      });
+    }
+    function renderEditQualityChips(){
+      var container = overlay.querySelector("#editQualityChips");
+      container.innerHTML = "";
+      state.qualityLevels.forEach(function(level, idx){
+        var tier = qualityTier((idx + 1) / state.qualityLevels.length);
+        var btn = document.createElement("button");
+        btn.className = "chip" + (level.id === editQualityId ? " q-active-" + tier : "");
+        btn.type = "button";
+        btn.textContent = level.label;
+        btn.addEventListener("click", function(){ editQualityId = level.id; renderEditQualityChips(); });
+        container.appendChild(btn);
+      });
+    }
+    renderEditPickerChips();
+    renderEditQualityChips();
+
+    overlay.querySelector("#editSave").addEventListener("click", function(){
+      var v = overlay.querySelector("#editTextInput").value.trim();
+      if (!v) { overlay.querySelector("#editTextInput").focus(); return; }
+      action.text = v;
+      action.category = editCategory;
+      action.location = editLocation;
+      var minVal = parseInt(overlay.querySelector("#editMinutesInput").value, 10);
+      action.minutes = (minVal && minVal > 0) ? minVal : null;
+      var qIdx = state.qualityLevels.findIndex(function(l){ return l.id === editQualityId; });
+      if (qIdx >= 0) {
+        action.qualityLabel = state.qualityLevels[qIdx].label;
+        action.qualityWeight = (qIdx + 1) / state.qualityLevels.length;
+      }
+      action.comment = overlay.querySelector("#editCommentInput").value.trim();
       saveState();
-      renderLogList();
+      renderAll();
+      if (historyView.style.display !== "none") renderHistoryList();
       document.body.removeChild(overlay);
     });
-    overlay.querySelector("#commentCancel").addEventListener("click", function(){
+    overlay.querySelector("#editCancel").addEventListener("click", function(){
       document.body.removeChild(overlay);
     });
   }
@@ -1396,9 +1853,16 @@
   })();
 
   resetBtn.addEventListener("click", function(){
-    openConfirmDialog("すべてのアンチビジョン・記録・統計を消去します。", function(){
+    openConfirmDialog(t("resetConfirm"), function(){
+      var keepLang = currentLang;
       state = JSON.parse(JSON.stringify(defaultState));
-      var p0 = makeProject({ title: "マイビジョン" });
+      state.lang = keepLang;
+      if (keepLang === "en") {
+        state.locationCategories = EN_SEED.locationCategories.slice();
+        state.taskCategories = EN_SEED.taskCategories.slice();
+        state.qualityLevels = JSON.parse(JSON.stringify(EN_SEED.qualityLevels));
+      }
+      var p0 = makeProject({ title: keepLang === "en" ? "My Vision" : "マイビジョン" });
       state.projects = [p0];
       state.activeProjectId = p0.id;
       proj = p0;
